@@ -1,4 +1,0 @@
-Software Requirements:
-Write a program to visually search an image collection. Your program will accept an image as a search
-query, and return a list of images in the collection ranked according to their similarity. You may choose to display only the
-top 20 images. You must demonstrate your system working using several different query images. 
