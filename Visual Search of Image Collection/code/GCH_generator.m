@@ -26,6 +26,7 @@ vector_values = reshape(bin,1,size(bin,1)*size(bin,2));
 H = hist(vector_values,quantiz_level^3);
 % Normalise the histogram so the area under it sums to 1.
 H = H ./sum(H);
+histogram(H);
+%return;
+%end
 
-end
-%return; %% remove
