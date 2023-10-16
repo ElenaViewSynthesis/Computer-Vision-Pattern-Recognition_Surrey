@@ -41,7 +41,7 @@ allfiles=dir (fullfile([DATASET_FOLDER,'/Images/*.bmp']));
 for filenum=1:length(allfiles)
     fname=allfiles(filenum).name;
     imgfname_full=([DATASET_FOLDER,'/Images/',fname]);
-    img=double(imread(imgfname_full))./255;
+    img=double(imread(imgfname_full));
     thesefeat=[];
     featfile=[DESCRIPTOR_FOLDER,'/',DESCRIPTOR_SUBFOLDER,'/',fname(1:end-4),'.mat'];%replace .bmp with .mat
     load(featfile,'F');
@@ -55,7 +55,7 @@ NIMG=size(ALLFEAT,1);           % number of images in collection
 queryimg=floor(rand()*NIMG);    % index of a random image
 %% CHANGE random
 
-%% 3) Compute the distance of image to the query
+%% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
 for i=1:NIMG
     candidate=ALLFEAT(i,:);
@@ -64,6 +64,7 @@ for i=1:NIMG
     dst=[dst ; [thedst i]];                % *The query image with a descriptor that matches the query perfectly,
                                            %  ex, distance zero 
 end
+% The smaller the distance, the more similar the image is to the query.
 dst=sortrows(dst,1);  % sort the results
 
 %% 4) Visualise the results
@@ -83,10 +84,53 @@ imshow(outdisplay);
 %imagesc(outdisplay);
 axis off;
 
-% Compute & Plot the PR Curve for the top 10-15 results.
+% put all in a loop
+
+classImgToQuery = 6;
+% Find that row of the feature category and extract all images
+%find()
+
+% Compute & Plot the *PRECISION-RECALL* Curve for the top 10-15 results
+precisionRecallCurve_constructor(NIMG, dst, classImgToQuery); %pass class as arg
+
 
 % If E similarities ragarding object categories => compute a confusino matrix:
 % here.......
+%.
+% conffig - Display a confusion matrix 
+% confmat - Compute a confusion matrix
+%
+trueValue = rand();
+%ConfusionMatrix = confusionmat(trueValue, predictedValue);
+
+imageClass = [];
+%for i=l:length() 
+
+%TransConfusionMatrix = ConfusionMatrix'
+%diagonal = diag(TransConfusionMatrix);
+%then we need the sum of each row (each image of allfeat[] in every row)
+
+% Mean Average Precision (MAP)
+% .
+% The MAP provides a single summary value for the overall performance of the descriptors. 
+% The confusion matrix visualizes the ranking performance across classes.
+
+
+% Average Precision (AP) for each class
+% in a loop for every single class 
+
+
+
+% Write code for eigen model using Eigen_build function for PCA application
+% Define a new function
+
+
+
+
+% L1 Norm = Manhattan distance
+% distance measures/descriptors
+
+
 
 
 
