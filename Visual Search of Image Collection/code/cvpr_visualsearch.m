@@ -89,14 +89,20 @@ axis off;
 
 % put all in a loop
 
-classImgToQuery = 113;
+classImgToQuery = 10;
 % disp(classImgToQuery); to remove
 
 % Find that row of the feature category and extract all images
 %find()
 
 % Compute & Plot the *PRECISION-RECALL* Curve for the top 10-15 results
-Curve = precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles);
+precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles);
+
+
+% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
+
+
+% Calculate AP and MAP
 
 
 
