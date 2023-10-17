@@ -41,10 +41,13 @@ allfiles=dir (fullfile([DATASET_FOLDER,'/Images/*.bmp']));
 for filenum=1:length(allfiles)
     fname=allfiles(filenum).name;
     imgfname_full=([DATASET_FOLDER,'/Images/',fname]);
+
     img=double(imread(imgfname_full));
+
     thesefeat=[];
     featfile=[DESCRIPTOR_FOLDER,'/',DESCRIPTOR_SUBFOLDER,'/',fname(1:end-4),'.mat'];%replace .bmp with .mat
     load(featfile,'F');
+
     ALLFILES{ctr}=imgfname_full;
     ALLFEAT=[ALLFEAT ; F];
     ctr=ctr+1;
@@ -86,12 +89,15 @@ axis off;
 
 % put all in a loop
 
-classImgToQuery = 6;
+classImgToQuery = 113;
+% disp(classImgToQuery); to remove
+
 % Find that row of the feature category and extract all images
 %find()
 
 % Compute & Plot the *PRECISION-RECALL* Curve for the top 10-15 results
-precisionRecallCurve_constructor(NIMG, dst, classImgToQuery); %pass class as arg
+Curve = precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles);
+
 
 
 % If E similarities ragarding object categories => compute a confusino matrix:
