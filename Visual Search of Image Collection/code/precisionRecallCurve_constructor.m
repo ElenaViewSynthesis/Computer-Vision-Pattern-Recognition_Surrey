@@ -1,4 +1,4 @@
-function [precision, recall] = precisionRecallCurve_constructor(numImgs, distSimilarities, classImgQuery, ImgsCollection)
+function precisionRecallCurve_constructor(numImgs, distSimilarities, classImgQuery, ImgsCollection)
 
 % Get the name of the image to query within the class it belongs to.
 classImgIndex=ImgsCollection(classImgQuery).name;
@@ -44,13 +44,20 @@ recall = zeros([1, numImgs-1]);
     %recall(i) = truePositives / sum(groundTruthVector);
 %end
 
+p = [];
+r = [];
 for k=1:size(distSimilarities,1)
     imgRankedName = char(ImgsCollection(distSimilarities(k,2)).name);
     imgRankedClass = imgRankedName(1:2);
     if imgRankedClass == retrievedImgClass
         truePositives = truePositives + 1;
     end
-    
+
+    precisionValues = truePositives / k;
+    recallValues = truePositives / totalElements;
+    % Append the new value to the recall array r as a new row.
+    r = [r ; recallValues]; 
+    p = [p ; precisionValues];
 end
 
 
@@ -64,21 +71,23 @@ end
 
 
 % Plot the PR Curve
-figure(3);
-plot(recall, precision, 'LineWidth', 2);
-hold on;
+
+
+plot(p, r, 'LineWidth', 2, 'Marker','o');
+
 xlabel('Recall');
 ylabel('Precision');
 title('Precision-Recall Curve');
 xlim([0 1]); % Limit values to range from 0 to 1
 ylim([0 1]);
 %legend('house', 'car', 'tree')
-% figure
+figure(3);
+%hold on;
+
 
 % [X,Y] = perfcurve(labels,scores,posclass);
 
 
 % https://www.youtube.com/watch?v=k-qgz1N5l7Y
 
-%return;
-end
+return;
