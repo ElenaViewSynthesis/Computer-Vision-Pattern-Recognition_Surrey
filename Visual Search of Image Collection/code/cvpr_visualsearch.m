@@ -88,33 +88,44 @@ end
 % The smaller the distance, the more similar the image is to the query.
 dst=sortrows(dst,1);  % sort the results
 
+
+
+classImgToQuery = floor(301); %selfies
+
+
+% Compute and plot the PRECISION-RECALL Curve for the top 10 results.
+precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
+% put all in a loop
+
+
+
+
 %% 4) Visualise the results
 %% These may be a little hard to see using imgshow
 %% If you have access, try using imshow(outdisplay) or imagesc(outdisplay)
 
-SHOW=15; % Show top 15 results
-dst=dst(1:SHOW,:);
-outdisplay=[];
-for i=1:size(dst,1)
-   img=imread(ALLFILES{dst(i,2)});
-   img=img(1:2:end,1:2:end,:); % make image a quarter size
-   img=img(1:81,:,:); % crop image to uniform size vertically (some MSVC images are different heights)
-   outdisplay=[outdisplay img];
-end
-imshow(outdisplay);
+
+
+%SHOW=15; % Show top 15 results
+%dst=dst(1:SHOW,:);
+%outdisplay=[];
+%for i=1:size(dst,1)
+%   img=imread(ALLFILES{dst(i,2)});
+%   img=img(1:2:end,1:2:end,:); % make image a quarter size
+%   img=img(1:81,:,:); % crop image to uniform size vertically (some MSVC images are different heights)
+%   outdisplay=[outdisplay img];
+%end
+%imshow(outdisplay);
 %imagesc(outdisplay);
-axis off;
+%axis off;
 
-% put all in a loop
 
-classImgToQuery = floor(480); %selfies
-% disp(classImgToQuery); to remove
+
 
 % Find that row of the feature category and extract all images
 %find()
 
-% Compute and plot the PRECISION-RECALL Curve for the top 10 results.
-precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles);
+
 
 
 % call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
