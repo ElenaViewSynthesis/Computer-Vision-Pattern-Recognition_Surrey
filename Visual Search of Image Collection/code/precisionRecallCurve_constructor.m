@@ -80,8 +80,8 @@ r = [];
             truePositives = truePositives +1;
         end
 
-        precisionValues = truePositives/k;
-        recallValues = truePositives/relevantCategories(labelPos);
+        precisionValues = truePositives / k;
+        recallValues = truePositives / relevantCategories(labelPos);
         
         % Append the new value to the recall array r as a new row.
         r = [r ; recallValues]; 
@@ -107,28 +107,41 @@ r = [];
     end
 end
 
+% Compute MAP over all queries for Average Precision 
+%avgP = p .* 
+% ap = trapz(r,p);
+disp("Average Pr");
+disp(AVGPRECISION);
+
+MeanAveragePrecision = sum(AVGPRECISION) / quantityOfCateg;
+disp("MEAN AP");
+disp(MeanAveragePrecision);
+
+figure(15);
+% Create the chart for confusion matrix (NEED to embed MAP)
+confusionchart(CONFUSION);
+
+
+
+
 
 
 % [X,Y] = perfcurve(labels,scores,posclass);
 
 % Plot the PR Curve
-plot(r, p, 'LineWidth', 2, 'Marker','o');
-xlabel('Recall');
-ylabel('Precision');
-title('Precision Recall Curve');
-xlim([0 1]); % Limit values to range from 0 to 1
-ylim([0 1]);
+%plot(r, p, 'LineWidth', 2, 'Marker','o');
+%xlabel('Recall');
+%ylabel('Precision');
+%title('Precision Recall Curve');
+%xlim([0 1]); % Limit values to range from 0 to 1
+%ylim([0 1]);
 %legend('house', 'car', 'tree')
-figure;
+%figure;
 
 
 
 % https://www.youtube.com/watch?v=k-qgz1N5l7Y
 
-% Compute MAP over all queries
-% For Average Precision 
-%avgP = p .* 
 
-% ap = trapz(r,p);
 
 return;
