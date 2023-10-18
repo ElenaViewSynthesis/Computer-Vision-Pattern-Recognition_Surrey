@@ -90,13 +90,24 @@ r = [];
             auxPvalue = auxPvalue + precisionValues;
         end
     end
-end
+
     avgP = auxPvalue/relevantCategories(labelPos);
     AVGPRECISION = [AVGPRECISION; avgP];
  
-% queryFeature
-
 % Calculate the confusion chart
+    distSimilarities = distSimilarities(1:15,:);
+
+    for n=1:size(distSimilarities,1)
+        imgRankedCategory = ImgCategories(distSimilarities(n,2),:);
+        if imgRankedCategory == labelPos
+            CONFUSION(labelPos, labelPos) = CONFUSION(labelPos, labelPos) + 1;
+        else 
+            CONFUSION(labelPos, imgRankedCategory) = CONFUSION(labelPos, imgRankedCategory) + 1;
+        end
+    end
+end
+
+
 
 % [X,Y] = perfcurve(labels,scores,posclass);
 
