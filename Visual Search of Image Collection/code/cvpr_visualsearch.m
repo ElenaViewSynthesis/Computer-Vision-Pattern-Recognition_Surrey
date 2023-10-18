@@ -33,7 +33,7 @@ DESCRIPTOR_SUBFOLDER='globalRGBhisto';
 
 %% 1) Load all the descriptors into "ALLFEAT"
 %% each row of ALLFEAT is a descriptor (is an image)
-
+classesOfImages = []; %% Need to compute the number of classes in our dataset
 ALLFEAT=[];
 ALLFILES=cell(1,0);
 ctr=1;
@@ -50,13 +50,31 @@ for filenum=1:length(allfiles)
 
     ALLFILES{ctr}=imgfname_full;
     ALLFEAT=[ALLFEAT ; F];
+    
+    % Check the second character of the filename whether it is a digit or a
+    % dash and then assign the respective number/ Image Label (scalar) to the 'class' matrix   
+    if fname(2) == '_'
+        label = str2double(fname(1)); % 1 digit
+    else 
+        label = str2double(fname(1:2));
+    end
+    classesOfImages = [classesOfImages ; label]; % Append label scalar to the classes matrix.
+    %splitName = split(fname, '-'); %Use underscore as a delimeter
+    %classesOfImages(filenum) = str2double(splitName(1));
     ctr=ctr+1;
 end
+
+%CATEGORIESh = histogram(classesOfImages).Values;
+%CATNum = length(CATEGORIESh);
+%disp(CATNum);
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
 NIMG=size(ALLFEAT,1);           % number of images in collection
 queryimg=floor(rand()*NIMG);    % index of a random image
+
 %% CHANGE random
+%% Add a nested for loop for class indices
+
 
 %% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
@@ -89,13 +107,13 @@ axis off;
 
 % put all in a loop
 
-classImgToQuery = 10;
+classImgToQuery = floor(480); %selfies
 % disp(classImgToQuery); to remove
 
 % Find that row of the feature category and extract all images
 %find()
 
-% Compute & Plot the *PRECISION-RECALL* Curve for the top 10-15 results
+% Compute and plot the PRECISION-RECALL Curve for the top 10 results.
 precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles);
 
 
@@ -140,6 +158,8 @@ imageClass = [];
 
 
 % L1 Norm = Manhattan distance
+% Cosine Similarity
+
 % distance measures/descriptors
 
 
