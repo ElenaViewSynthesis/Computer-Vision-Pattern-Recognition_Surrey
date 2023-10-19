@@ -89,13 +89,33 @@ end
 dst=sortrows(dst,1);  % sort the results
 
 
-
+%% CHANGE This to specifc IMAGE
 classImgToQuery = floor(301); %selfies
 
+% put all in a loop
 
 % Compute and plot the PRECISION-RECALL Curve for the top 10 results.
 precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
-% put all in a loop
+
+% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
+
+
+
+
+% L7 part 1 slides 8-20
+% Spatial Grid = Colour Grid + Texture Grid
+% Try diff levels of *ANGULAR QUANTIZATION*
+% Colour Grid -> *Mahalanobis distance*
+% .
+% .
+% EOH = Edge Orientation Histogram -> compute for each grid cell
+% Concatenate cells into an image descriptor similarly with *COLOUR APPROACH*
+% EOH using Euclidean distance
+
+% https://www.youtube.com/watch?v=nsyf-S6iZLM
+% https://www.youtube.com/watch?v=6tKPgIH_Uuc
+
+
 
 
 
@@ -120,60 +140,31 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 %axis off;
 
 
-
-
-% Find that row of the feature category and extract all images
-%find()
-
-
-
-
-% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
-
-
-% Calculate AP and MAP
-
-
-
-% If E similarities ragarding object categories => compute a confusino matrix:
-% here.......
-%.
-% conffig - Display a confusion matrix 
-% confmat - Compute a confusion matrix
-%
-trueValue = rand();
-%ConfusionMatrix = confusionmat(trueValue, predictedValue);
-
-imageClass = [];
-%for i=l:length() 
-
-%TransConfusionMatrix = ConfusionMatrix'
-%diagonal = diag(TransConfusionMatrix);
-%then we need the sum of each row (each image of allfeat[] in every row)
-
-% Mean Average Precision (MAP)
-% .
-% The MAP provides a single summary value for the overall performance of the descriptors. 
-% The confusion matrix visualizes the ranking performance across classes.
-
-
-% Average Precision (AP) for each class
-% in a loop for every single class 
-
-
-
+%% Project image descriptors into *lower dimensional space*
+% .                     PCA over dataset
 % Write code for eigen model using Eigen_build function for PCA application
-% Define a new function
-
+%% Mahalanobis distance
+%
+% LABS cvpr code
 
 
 
 % L1 Norm = Manhattan distance
 % Cosine Similarity
 
+
+
 % distance measures/descriptors
 
 
+
+
+
+%% Bag of Visual Words retrieval (BoVM)
+%% Haris Corner Detector (sparse feature detector)
+% plus a SIFT descriptor
+% Use K-means to create the codebook
+% Compare performance
 
 
 
