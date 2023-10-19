@@ -74,6 +74,8 @@ r = [];
 %    if imgRankedClass == retrievedImgClass
 %        truePositives = truePositives + 1;
 %    end
+
+% Find row of the feature category and extract all images.
     for k=1:size(distSimilarities,1)
         imgRankedCategory = ImgCategories(distSimilarities(k,2),:);
         if imgRankedCategory == labelPos
@@ -90,7 +92,10 @@ r = [];
             auxPvalue = auxPvalue + precisionValues;
         end
     end
+    
 
+% Average Precision (AP) for each class
+% in a loop for every single class 
     avgP = auxPvalue/relevantCategories(labelPos);
     AVGPRECISION = [AVGPRECISION; avgP];
  
@@ -110,24 +115,37 @@ end
 % Compute MAP over all queries for Average Precision 
 %avgP = p .* 
 % ap = trapz(r,p);
-disp("Average Pr");
+disp("Average Precision");
 disp(AVGPRECISION);
 
+% Mean Average Precision (MAP)
+% .
+% The MAP provides a single summary value for the overall performance of the descriptors. 
+% The confusion matrix visualizes the ranking performance across classes.
 MeanAveragePrecision = sum(AVGPRECISION) / quantityOfCateg;
 disp("MEAN AP");
 disp(MeanAveragePrecision);
 
-figure(15);
+
+
+% conffig - Display a confusion matrix 
+% confmat - Compute a confusion matrix
+% .
+% ConfusionMatrix = confusionmat(trueValue, predictedValue);
+% .
+% TransConfusionMatrix = ConfusionMatrix'
+% diagonal = diag(TransConfusionMatrix);
+% then we need the sum of each row (each image of allfeat[] in every row)
+
+
+
+figure(5);
 % Create the chart for confusion matrix (NEED to embed MAP)
 confusionchart(CONFUSION);
 
-
-
-
-
-
 % [X,Y] = perfcurve(labels,scores,posclass);
 
+%figure;
 % Plot the PR Curve
 %plot(r, p, 'LineWidth', 2, 'Marker','o');
 %xlabel('Recall');
@@ -135,8 +153,8 @@ confusionchart(CONFUSION);
 %title('Precision Recall Curve');
 %xlim([0 1]); % Limit values to range from 0 to 1
 %ylim([0 1]);
-%legend('house', 'car', 'tree')
-%figure;
+%legend('house', 'car', 'tree') % REMOVEEEEeeeeee
+
 
 
 
