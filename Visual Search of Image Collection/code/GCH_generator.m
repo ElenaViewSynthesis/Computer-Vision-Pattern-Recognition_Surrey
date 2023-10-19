@@ -1,5 +1,7 @@
 function H=GCH_generator(img,quantiz_level)
 % .
+% https://www.youtube.com/watch?v=uqeOrtAzSyU
+% .
 % Create a COLOUR BASED VISUAL SEARCH system using the *Global Colour Histogram
 % using Euclidean distance metric.
 % *Experiment with different levels of RGB quantization*
@@ -26,7 +28,18 @@ vector_values = reshape(bin,1,size(bin,1)*size(bin,2));
 H = hist(vector_values,quantiz_level^3);
 % Normalise the histogram so the area under it sums to 1.
 H = H ./sum(H);
+figure(4);
 histogram(H);
-%return;
+
+% For Testing & Visualization Purposes
+%figure(4);
+%hold on;
+%subplot(1,3,2);
+%imshow(uint8(img));
+%subplot(1,3,3);
+%xlabel('Bins');
+
+
+return;
 %end
 
