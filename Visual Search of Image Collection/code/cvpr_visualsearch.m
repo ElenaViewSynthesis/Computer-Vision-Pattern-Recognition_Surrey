@@ -59,8 +59,6 @@ for filenum=1:length(allfiles)
         label = str2double(fname(1:2));
     end
     classesOfImages = [classesOfImages ; label]; % Append label scalar to the classes matrix.
-    %splitName = split(fname, '-'); %Use underscore as a delimeter
-    %classesOfImages(filenum) = str2double(splitName(1));
     ctr=ctr+1;
 end
 
@@ -79,7 +77,7 @@ queryimg=floor(rand()*NIMG);    % index of a random image
 %% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
 for i=1:NIMG
-    candidate=ALLFEAT(i,:);
+    candidate=ALLFEAT(i,:);        % EUCLIDEAN
     query=ALLFEAT(queryimg,:);
     thedst=cvpr_compare(query,candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors.
     dst=[dst ; [thedst i]];                % *The query image with a descriptor that matches the query perfectly,
@@ -89,10 +87,12 @@ end
 dst=sortrows(dst,1);  % sort the results
 
 
-%% CHANGE This to specifc IMAGE
+%% CHANGE This to specific IMAGE
 classImgToQuery = floor(301); %selfies
 
-% put all in a loop
+
+
+% put all in a loop ..........................
 
 % Compute and plot the PRECISION-RECALL Curve for the top 10 results.
 precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
@@ -102,18 +102,37 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 
 
-% L7 part 1 slides 8-20
-% Spatial Grid = Colour Grid + Texture Grid
+% L7 part 1 slides 8-20      ->      'gridColourDescr.m'
+%% *Spatial Grid* = Colour Grid + Texture Grid
 % Try diff levels of *ANGULAR QUANTIZATION*
+% 
+% Accumulate the MAGNITUDE of colour+texture within each angle bin to create a histogram
 % Colour Grid -> *Mahalanobis distance*
 % .
 % .
-% EOH = Edge Orientation Histogram -> compute for each grid cell
+% EOH = Edge Orientation Histogram -> (TEXTURE info) compute for each grid cell
 % Concatenate cells into an image descriptor similarly with *COLOUR APPROACH*
 % EOH using Euclidean distance
+%           with Sobel filter -> estimate edge orientation theta
+
+% *COMBINE* EOH & COLOUR
 
 % https://www.youtube.com/watch?v=nsyf-S6iZLM
 % https://www.youtube.com/watch?v=6tKPgIH_Uuc
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -155,6 +174,11 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 
 % distance measures/descriptors
+% .
+% . 
+%               Wavelet Transform based Preprocessing & Features Extraction
+% 
+%               https://www.youtube.com/watch?v=YF0zq9bcaAE
 
 
 
