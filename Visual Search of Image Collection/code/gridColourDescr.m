@@ -25,6 +25,8 @@ for filenum=1:length(allfiles)
     save(fout,'GRIDCOLOUR');
     toc
 end
+                        % Don't forget
+                        %% PRINT the results
 
 
 % IMPLEMENT another descriptor for Texture features histo   ?
