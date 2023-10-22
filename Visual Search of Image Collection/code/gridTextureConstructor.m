@@ -26,14 +26,22 @@ for r=1:griDivision
     for c=1:griDivision
          startingRowPosition = round((r-1)*targetImgR / griDivision+1);
         endingRowPosition = round(r*targetImgR / griDivision);
+        startingColPosition = round((c-1)*targetImgC / griDivision+1);
+        endingColPosition = round((c*targetImgC/griDivision));
 
-        % check for columns
+        targetImgCell = targetImg(startingRowPosition:endingRowPosition, startingColPosition:endingColPosition, :);
+        
+        % The image must be grayscaled
+        grayImgCell = rgb2gray(targetImgCell);
+        
+
+
     end
 end
 
 
 
-% The image must be grayscaled
+
 
 
 
