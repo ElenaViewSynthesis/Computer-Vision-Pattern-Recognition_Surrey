@@ -104,18 +104,18 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % L7 part 1 slides 8-20      ->      'gridColourDescr.m'
 %% *Spatial Grid* = Colour Grid + Texture Grid
-% Try diff levels of *ANGULAR QUANTIZATION*
+% Try diff levels of *ANGULAR QUANTIZATION* (for texture features)
 % 
 % Accumulate the MAGNITUDE of colour+texture within each angle bin to create a histogram
-% Colour Grid -> *Mahalanobis distance*
+%% Colour Grid -> *Mahalanobis distance*
 % .
 % .
-% EOH = Edge Orientation Histogram -> (TEXTURE info) compute for each grid cell
+%% EOH = Edge Orientation Histogram -> (TEXTURE info) compute for each grid cell
 % Concatenate cells into an image descriptor similarly with *COLOUR APPROACH*
-% EOH using Euclidean distance
-%           with Sobel filter -> estimate edge orientation theta
+%% EOH using Euclidean distance
+%%           with Sobel filter -> estimate edge orientation theta
 
-% *COMBINE* EOH & COLOUR
+%% *COMBINE* EOH & COLOUR
 
 % https://www.youtube.com/watch?v=nsyf-S6iZLM
 % https://www.youtube.com/watch?v=6tKPgIH_Uuc
@@ -189,6 +189,41 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 % plus a SIFT descriptor
 % Use K-means to create the codebook
 % Compare performance
+
+
+
+%% New: "Image indexing using color correlograms"
+%% NEW: Canny Edge Detector 
+%  The output edges will be a binary edge map instead of gradient values.
+%  compute orientation from the edge pixels.
+%  Generate the histogram from Orientation and Magnitude as before.
+%  Tune the Canny thresholds to get good edge maps for your images.
+
+                        %% Canny vs Sobel:
+         % Use Canny instead of Sobel to getcleaner edges.
+         % Canny does additional processing like non-max suppression to get
+         % better edges.
+         % Compute gradient orientation and magnitude from the Canny edge map.
+         % Build weighted histogram using magnitude for importance.
+
+
+
+
+
+
+
+
+
+% For Video MPEG-7 Visual Shape Descriptors
+%% https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=927426
+% 1) Shape Spectrum - 3D Shape Descriptor
+% 2) Angular Radial Transformation (ART) - Region-Based Shape Descriptor
+% 3) Contour-Based Shape Descriptor
+% 4) 2D/3D Descriptor
+
+
+
+
 
 
 
