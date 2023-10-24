@@ -1,4 +1,4 @@
-function GridTexture = gridTextureConstructor(targetImg, griDivision)
+function GridTexture = gridTextureConstructor(targetImg, griDivision, levelsOfQuantization, textureThreshold)
 
     %% Law's Texture Energy Convolution masks:
     %% L5-Level mask: detects horizontal texture
@@ -12,6 +12,9 @@ L5 = [-1 2 -1];
 E5 = [-1 0 1];
 S5 = [1 2 1];
 R5 = [1 -2 1];
+
+%% Bins/Quantization level determine how the range of texture values is divided into discrete intervals, 
+% and each bin represents a specific range of texture values.
 
 blur = [];
 textureFeatures = [];
@@ -62,28 +65,28 @@ for r=1:griDivision
         xDiffSobel = conv2(imgBlur, xSobelNormalised, 'same');
         yDiffSobel = conv2(imgBlur, ySobelNormalised, 'same');
                                                               
-        %% Gradient Magnitude Computation
+        %% Gradient Magnitude Computation 
         % Get the edgeMagnitude (square them up individually, addition, sqrt of sum)
-        
-
+        gradientMagnitudeAtEachPixelofTargetCell = sqrt((xDiffSobel .^ 2) + (yDiffSobel .^ 2));
+    
         %% Now, compute the orientation of edges
         %% Estimation of edge orientation theta with atan((df/dy) / (df/dx))
-        % theta = 0-360 || 0-2pi
-        
+        % atan2(y, x) calculates the angle theta = arctan(y/x) in radians
+        gradientOrientationAngleAtEachPixelofTargetCell = atan2(yDiffSobel, xDiffSobel);
+         % gradientOrientationAngleAtEachPixelofTargetCell = mod(atan2(img_y, img_x), 2*pi);
         
          %% SOS: Normalise prior to concatenation 
-        % Quantise orientation into 8 bins (0-2pi)
-                % agnle = orientation
-
-         % sobel_imgOR = mod(atan2(img_y, img_x), 2*pi);
-         angle_img = angle_img - min(reshape(angle_img, 1, [])); % convert img matrix to 1D row vector.
+        % Quantise orientation into 8 bins (0-2pi), % theta = 0-360 || 0-2pi
+         % Map angles to [0, 2pi] instead of [-pi, pi] for easier histogram creation.
+        gradientOrientationAngleAtEachPixelofTargetCell = gradientOrientationAngleAtEachPixelofTargetCell - min(reshape(gradientOrientationAngleAtEachPixelofTargetCell, 1, [])); % convert img matrix to 1D row vector.
         
-
-        %% Only count orientations from strong edges
+        %% Only count orientations from strong edges        ???
 
         % EOH (frequency) histogram depicts the frequency of pixels that for every value of theta of
         % pixel inside the cell belongs to one of the bins 
+        eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTargetCell, gradientOrientationAngleAtEachPixelofTargetCell, levelsOfQuantization, textureThreshold);
         
+        % create histo and concat to descr
         
         % Avoid noisy regions by checking if theta is greater than threshold
        
@@ -101,9 +104,6 @@ end
 
 %G = [E A];
 
-
-% For Texture Features experiment with different levels of angular
-% quantization
 
 
 bins=0;
