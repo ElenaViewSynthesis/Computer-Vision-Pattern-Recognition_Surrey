@@ -1,4 +1,4 @@
-function GridTexture = gridTextureConstructor(targetImg, griDivision, levelsOfQuantization, textureThreshold)
+function GridTextureDescr = gridTextureConstructor(targetImg, griDivision, levelsOfQuantization, textureThreshold)
 
     %% Law's Texture Energy Convolution masks:
     %% L5-Level mask: detects horizontal texture
@@ -13,6 +13,7 @@ E5 = [-1 0 1];
 S5 = [1 2 1];
 R5 = [1 -2 1];
 
+SpatialGridTextureDescr = [];
 %% Bins/Quantization level determine how the range of texture values is divided into discrete intervals, 
 % and each bin represents a specific range of texture values.
 
@@ -85,38 +86,13 @@ for r=1:griDivision
         % EOH (frequency) histogram depicts the frequency of pixels that for every value of theta of
         % pixel inside the cell belongs to one of the bins 
         eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTargetCell, gradientOrientationAngleAtEachPixelofTargetCell, levelsOfQuantization, textureThreshold);
-        
-        % create histo and concat to descr
-        
-        % Avoid noisy regions by checking if theta is greater than threshold
-       
-        
-
-        % Something like that
-        %E = [E ComputeEdgeOrientationHistogram(subImage)];
-        %C = ComputeGlobalColour(subImage);
-        % C(1) = Average Red, C(2) = Average Green, C(3) = Average Blue
-        %A = [A C(1) C(2) C(3)];
-        
+        SpatialGridTextureDescr = [SpatialGridTextureDescr eoh];
+              
 
     end
 end
-
-%G = [E A];
-
-
-
-bins=0;
-threshold=0;
-
-% Reduce the length of the final feature vector using PCA or LDA if needed.
-
-
-
-
-
+GridTextureDescr = SpatialGridTextureDescr;
 return;
-%end
 
 
                                 %% OBESRVATIONS:
@@ -128,7 +104,22 @@ return;
 % Extract edges in other color channels or color spaces, not just grayscale.
 % Concatenate multiple oriented histograms with different angular resolution.
 % 
-%% Using more robust edge detection, adaptive quantization, weighting, normalization, 
-%% and multi-scale histograms could improve the representation of edge texture for the region.
+% Using more robust edge detection, adaptive quantization, weighting, normalization, 
+% and multi-scale histograms could improve the representation of edge texture for the region.
+% ......................................................................................................................................
+
+                                %% Types of Texture Descriptors:
+% Filter-Based Descriptors: These descriptors use filters, such as Gabor filters or wavelet transforms, 
+% to analyze the frequency and orientation components of textures.
+
+% Local Binary Patterns (LBP): LBP is a popular texture descriptor that encodes the local spatial patterns 
+% of pixel neighborhoods in an image.
+
+% Haralick Features: These features are derived from GLCM and capture texture properties like contrast, 
+% energy, entropy, and correlation.
+
+% Texture Energy Measures: These measures compute texture energy or contrast based on pixel intensity gradients.
+
+% Fractal-Based Descriptors: These descriptors use fractal theory to capture self-similarity or self-affinity in textures.
 
 
