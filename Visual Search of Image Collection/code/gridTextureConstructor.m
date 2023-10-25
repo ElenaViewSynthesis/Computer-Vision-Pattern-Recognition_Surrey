@@ -80,15 +80,12 @@ for r=1:griDivision
         % Quantise orientation into 8 bins (0-2pi), % theta = 0-360 || 0-2pi
          % Map angles to [0, 2pi] instead of [-pi, pi] for easier histogram creation.
         gradientOrientationEdgeAtEachPixelofTargetCell = gradientOrientationEdgeAtEachPixelofTargetCell - min(reshape(gradientOrientationEdgeAtEachPixelofTargetCell, 1, [])); % convert img matrix to 1D row vector.
-        
-        %% Only count orientations from strong edges        ???
 
         % EOH (frequency) histogram depicts the frequency of pixels that for every value of theta of
         % pixel inside the cell belongs to one of the bins 
         eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTargetCell, gradientOrientationEdgeAtEachPixelofTargetCell, levelsOfQuantization, textureThreshold);
         SpatialGridTextureDescr = [SpatialGridTextureDescr eoh];
               
-
     end
 end
 GridTextureDescr = SpatialGridTextureDescr;
