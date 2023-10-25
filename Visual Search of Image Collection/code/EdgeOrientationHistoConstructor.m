@@ -48,12 +48,5 @@ function EOH = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTar
     end
 return;
 %end
-        % Something like: COLOUR + EOH = result
 
-        %E = [E ComputeEdgeOrientationHistogram(subImage)];
-        %C = ComputeGlobalColour(subImage);
-        % C(1) = Average Red, C(2) = Average Green, C(3) = Average Blue
-        %A = [A C(1) C(2) C(3)];
-        %G = [E A];
-                                    %% SOS
-        % Reduce the length of the final feature vector using PCA or LDA if needed
+
