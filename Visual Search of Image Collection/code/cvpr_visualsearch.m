@@ -92,7 +92,7 @@ classImgToQuery = floor(301); %selfies
 
 
 
-% put all in a loop ..........................
+% put all in a loop ....
 
 % Compute and plot the PRECISION-RECALL Curve for the top 10 results.
 precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
@@ -102,9 +102,9 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 
 
-% L7 part 1 slides 8-20      ->      'gridColourDescr.m'
+% L7 part 1 slides 8-20 
 %% *Spatial Grid* = Colour Grid + Texture Grid
-% Try diff levels of *ANGULAR QUANTIZATION* (for texture features)
+% Try diff levels of *ANGULAR QUANTIZATION* for texture features
 % 
 % Accumulate the MAGNITUDE of colour+texture within each angle bin to create a histogram
 %% Colour Grid -> *Mahalanobis distance*
@@ -119,20 +119,6 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % https://www.youtube.com/watch?v=nsyf-S6iZLM
 % https://www.youtube.com/watch?v=6tKPgIH_Uuc
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -221,7 +207,50 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 % 3) Contour-Based Shape Descriptor
 % 4) 2D/3D Descriptor
 
+                            %% Notes Taking
+% Feature Descriptors: These are representations of distinct features in an 
+% image that are useful for tasks like object recognition, matching, and tracking.
 
+% Histogram Descriptors: These are based on histograms of pixel intensities, colors, or other attributes within an image.
+
+% Shape Descriptors: These describe the shape or contour of objects within an image, 
+% often including properties like area, perimeter, and eccentricity.
+
+% Color Descriptors: These represent color information within an image, typically using color histograms or color moments.
+
+% Texture Descriptors: As mentioned earlier, these capture textural properties and patterns within an image.
+
+% Local Feature Descriptors: These represent local regions of an image, often used in object recognition and 
+% matching. Examples include SIFT (Scale-Invariant Feature Transform) and SURF (Speeded-Up Robust Features).
+
+% Edge Descriptors: These focus on the detection and representation of edges within an image.
+
+% Corner Descriptors: These are focused on detecting and representing corner points within an image, 
+% often used in image alignment and registration.
+
+% Scale-Invariant Descriptors: These are descriptors that remain consistent even when an image is scaled (i.e., SIFT features).
+
+% Rotation-Invariant Descriptors: These are descriptors that remain consistent under rotation (i.e., ORB features).
+
+% Texture-Based Descriptors: These descriptors focus on capturing and distinguishing different textures in images.
+
+% Appearance Descriptors: These describe the overall appearance or visual characteristics of objects or scenes.
+
+Local Binary Descriptors: These are binary representations of local image patches, often used in real-time applications.
+
+Shape Context Descriptors: These describe the spatial distribution of edge or contour points relative to a reference point.
+
+Statistical Descriptors: These include moments, variances, and statistical measures that describe the image's pixel intensity distribution.
+
+Invariance Descriptors: These aim to capture invariance properties, such as rotation, translation, and scale invariance.
+
+Haar-like Descriptors: Used in object detection and face detection, these descriptors are based on Haar-like features.
+
+HOG (Histogram of Oriented Gradients) Descriptors: Used for object detection and pedestrian detection, HOG captures gradient information in local image regions.
+
+Haralick Texture Descriptors: These quantify texture features based on gray-level co-occurrence matrices.
+
+Fractal Descriptors: These capture self-similarity or fractal properties in textures and images.
 
 
 
