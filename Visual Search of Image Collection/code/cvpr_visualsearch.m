@@ -236,21 +236,23 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % Appearance Descriptors: These describe the overall appearance or visual characteristics of objects or scenes.
 
-Local Binary Descriptors: These are binary representations of local image patches, often used in real-time applications.
+% Local Binary Descriptors: These are binary representations of local image patches, often used in real-time applications.
 
-Shape Context Descriptors: These describe the spatial distribution of edge or contour points relative to a reference point.
+% Shape Context Descriptors: These describe the spatial distribution of edge or contour points relative to a reference point.
 
-Statistical Descriptors: These include moments, variances, and statistical measures that describe the image's pixel intensity distribution.
+% Statistical Descriptors: These include moments, variances, and statistical measures that describe the image's 
+% pixel intensity distribution.
 
-Invariance Descriptors: These aim to capture invariance properties, such as rotation, translation, and scale invariance.
+% Invariance Descriptors: These aim to capture invariance properties, such as rotation, translation, and scale invariance.
 
-Haar-like Descriptors: Used in object detection and face detection, these descriptors are based on Haar-like features.
+% Haar-like Descriptors: Used in object detection and face detection, these descriptors are based on Haar-like features.
 
-HOG (Histogram of Oriented Gradients) Descriptors: Used for object detection and pedestrian detection, HOG captures gradient information in local image regions.
+% HOG (Histogram of Oriented Gradients) Descriptors: Used for object detection and pedestrian detection, 
+% HOG captures gradient information in local image regions.
 
-Haralick Texture Descriptors: These quantify texture features based on gray-level co-occurrence matrices.
+% Haralick Texture Descriptors: These quantify texture features based on gray-level co-occurrence matrices.
 
-Fractal Descriptors: These capture self-similarity or fractal properties in textures and images.
+% Fractal Descriptors: These capture self-similarity or fractal properties in textures and images.
 
 
 
