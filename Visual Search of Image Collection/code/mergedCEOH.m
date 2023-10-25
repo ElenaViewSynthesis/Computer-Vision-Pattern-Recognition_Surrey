@@ -47,10 +47,17 @@ for r=1:cell
         
         imgBlur = conv2(im2double(grayScaledImageCell),normalisedBlurKernel,'same');
         xDiffSobel = conv2(imgBlur, xSobelNormalised, 'same');
-        %yDiffSobel
+        yDiffSobel = conv2(imgBlur, ySobelNormalised, 'same');
 
-
+        gradientMagnitudeAtEachPixelofGrayImgCell = sqrt((xDiffSobel .^ 2) + (yDiffSobel .^ 2));
+        gradientOrientationEdgeAtEachPixelofGrayImgCell = atan2(yDiffSobel, xDiffSobel);
         
+        %% Quantise orientation into 8 bins (0-2pi), theta = 0-360 || 0-2pi -> Map angles to [0, 2pi].
+        gradientOrientationEdgeAtEachPixelofGrayImgCell = gradientOrientationEdgeAtEachPixelofGrayImgCell - min(reshape(gradientOrientationEdgeAtEachPixelofGrayImgCell, 1, [])); % convert img matrix to 1D row vector
+        eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofGrayImgCell, gradientOrientationEdgeAtEachPixelofGrayImgCell, quantizationLevels, cutOffValue);
+
+
+
          %% Pseudocode: COLOUR + EOH 
         % ..........................................................................................
         % CEOH = [CEOH EdgeOrientationHisto(targetImgCell)];
@@ -59,8 +66,8 @@ for r=1:cell
         % AVERAGECOLORCELLS = [AVERAGECORCELLS COLORCELL(1) COLORCELL(2) COLORCELL(3)];
         % mixDescriptor = [CEOH AVERAGECOLORCELLS];
         % ..........................................................................................
-
-
+        
+        %here
 
 
 
