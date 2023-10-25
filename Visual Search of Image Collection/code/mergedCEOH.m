@@ -6,7 +6,7 @@ xSobel = [1 2 1; 0 0 0; -1 -2 -1];
 ySobel = xSobel';
 
 % Determine the rows and columns.     
-CEOHdescriptor = [];
+combinedEOH = [];
 grayScaledImage = rgb2gray(targetImage);
 [grayImgRow, grayImgCol, ~] = size(grayScaledImage);
 
@@ -67,14 +67,16 @@ for r=1:cell
         % mixDescriptor = [CEOH AVERAGECOLORCELLS];
         % ..........................................................................................
         
-        %here
-
-
-
+        % Merge mean colour values to Edge Orientation histogram into a single vector descriptor.
+        combinedEOH = [combinedEOH eoh rgbMean(1) rgbMean(2) rgbMean(3)];
     end
-end                                 
+end                         
+CEOHdescriptor = combinedEOH;
+
+return;
+%end
+
                                         %% SOS
         % Reduce the length of the final feature vector using PCA or LDA if needed
         %%                        => build Eigen Model
 
-end
