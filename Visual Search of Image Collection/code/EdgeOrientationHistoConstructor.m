@@ -2,7 +2,7 @@ function EOH = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTar
     
     numBins = 8;
     [imgEdgeOrienRow, imgEdgeOrienCol, ~] = size(gradientOrientationEdgeAtEachPixelofTargetCell);
-    updatedBinsOfEachEdgeOrient = []; % values of bins for the edge angle to be stored
+    updatedBinsOfEachEdgeOrients = []; % values of bins for the edge angle to be stored
         
     
 
@@ -29,13 +29,25 @@ function EOH = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTar
 
 
 
-    %% Only count orientations from strong edges
-    % start the nested for here
+    %% Only count orientations from strong edges with comparison to texture threshold
+    % start the nested for here 
+    for row=1:imgEdgeOrienRow
+        for col=1:imgEdgeOrienCol
+            if gradientMagnitudeAtEachPixelofTargetCell(imgEdgeOrienRow, imgEdgeOrienCol) > textureThreshold % magnitude threshold
+                updatedQuantLevel = ((gradientOrientationEdgeAtEachPixelofTargetCell(imgEdgeOrienRow, imgEdgeOrienCol))/(2*pi));
+                updatedQuantLevel = floor(updatedQuantLevel*levelsOfQuantization); % scales the orientation to the range [0, bin). 
 
-
-
-
-end
+                updatedBinsOfEachEdgeOrients = [updatedBinsOfEachEdgeOrients updatedQuantLevel];
+            end
+        end
+    end
+    if size(updatedBinsOfEachEdgeOrients, 2) == 0 % matrix along its second dimension/columns is empty.
+        EOH = zeros(1, levelsOfQuantization); % a row vector of zeros with a length of bin -> EOH is a valid output even when there are no data points.
+    else 
+        EOH = histogram(updatedBinsOfEachEdgeOrients, levelsOfQuantization, 'Normalization', 'probability').Values;
+    end
+return;
+%end
         % Something like: COLOUR + EOH = result
 
         %E = [E ComputeEdgeOrientationHistogram(subImage)];
