@@ -10,10 +10,18 @@ CEOHdescriptor = [];
 grayScaledImage = rgb2gray(targetImage);
 [grayImgRow, grayImgCol, ~] = size(grayScaledImage);
 
+% For experimentation purposes
 blur = [];
 textureFeatures = [];
 
+blurKernel = [1 1 1; 1 1 1; 1 1 1];
+normalisator = 9;
+normalisedBlurKernel = blurKernel ./ normalisator;
+
 % Normalise Sobel filters for both dimensions.
+sobelNorm = 4;
+xSobelNormalised = xSobel ./ sobelNorm;
+ySobelNormalised = xSobelNormalised';
 
 
 for r=1:cell
@@ -31,18 +39,19 @@ for r=1:cell
         end
         endingColPosition = round((c*grayImgCol/cell));
         
-        grayScaledImgCell = grayScaledImage(startingRowPosition:endingRowPosition, startingColPosition:endingColPosition, :);
+        nonGrayScaledImgCell = targetImage(startingRowPosition:endingRowPosition, startingColPosition:endingColPosition, :);
+        grayScaledImageCell = grayScaledImage(startingRowPosition:endingRowPosition, startingColPosition:endingColPosition, :);
+     
         % Now compute mean color channels of current gray image cell
+        rgbMean = extractAvgRGB(nonGrayScaledImgCell);
         
+        imgBlur = conv2(im2double(grayScaledImageCell),normalisedBlurKernel,'same');
+        xDiffSobel = conv2(imgBlur, xSobelNormalised, 'same');
+        %yDiffSobel
 
 
-    end
-end
-
-
-
-
-        %% Pseudocode: COLOUR + EOH 
+        
+         %% Pseudocode: COLOUR + EOH 
         % ..........................................................................................
         % CEOH = [CEOH EdgeOrientationHisto(targetImgCell)];
         % COLORCELL = GCH(targetImgCell);
@@ -50,9 +59,13 @@ end
         % AVERAGECOLORCELLS = [AVERAGECORCELLS COLORCELL(1) COLORCELL(2) COLORCELL(3)];
         % mixDescriptor = [CEOH AVERAGECOLORCELLS];
         % ..........................................................................................
-                                   
-        
-        
+
+
+
+
+
+    end
+end                                 
                                         %% SOS
         % Reduce the length of the final feature vector using PCA or LDA if needed
         %%                        => build Eigen Model
