@@ -73,19 +73,19 @@ for r=1:griDivision
         %% Now, compute the orientation of edges
         %% Estimation of edge orientation theta with atan((df/dy) / (df/dx))
         % atan2(y, x) calculates the angle theta = arctan(y/x) in radians
-        gradientOrientationAngleAtEachPixelofTargetCell = atan2(yDiffSobel, xDiffSobel);
+        gradientOrientationEdgeAtEachPixelofTargetCell = atan2(yDiffSobel, xDiffSobel);
          % gradientOrientationAngleAtEachPixelofTargetCell = mod(atan2(img_y, img_x), 2*pi);
         
          %% SOS: Normalise prior to concatenation 
         % Quantise orientation into 8 bins (0-2pi), % theta = 0-360 || 0-2pi
          % Map angles to [0, 2pi] instead of [-pi, pi] for easier histogram creation.
-        gradientOrientationAngleAtEachPixelofTargetCell = gradientOrientationAngleAtEachPixelofTargetCell - min(reshape(gradientOrientationAngleAtEachPixelofTargetCell, 1, [])); % convert img matrix to 1D row vector.
+        gradientOrientationEdgeAtEachPixelofTargetCell = gradientOrientationEdgeAtEachPixelofTargetCell - min(reshape(gradientOrientationEdgeAtEachPixelofTargetCell, 1, [])); % convert img matrix to 1D row vector.
         
         %% Only count orientations from strong edges        ???
 
         % EOH (frequency) histogram depicts the frequency of pixels that for every value of theta of
         % pixel inside the cell belongs to one of the bins 
-        eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTargetCell, gradientOrientationAngleAtEachPixelofTargetCell, levelsOfQuantization, textureThreshold);
+        eoh = EdgeOrientationHistoConstructor(gradientMagnitudeAtEachPixelofTargetCell, gradientOrientationEdgeAtEachPixelofTargetCell, levelsOfQuantization, textureThreshold);
         SpatialGridTextureDescr = [SpatialGridTextureDescr eoh];
               
 
