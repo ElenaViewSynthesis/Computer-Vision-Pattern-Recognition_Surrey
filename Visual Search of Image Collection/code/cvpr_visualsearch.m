@@ -254,6 +254,22 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % Fractal Descriptors: These capture self-similarity or fractal properties in textures and images.
 
+                                        %% LOCAL DESCRIPTORS
+% They capture the local visual information around interest points or keypoints in an image. 
+% This allows matching and comparison of local regions between images.
+
+% Popular local descriptor algorithms include SIFT, SURF, ORB, BRISK, FREAK, etc. SIFT and SURF are considered
+% more robust but slower, while ORB, BRISK and FREAK trade off some robustness for faster computation.
+
+% They are used for tasks like image matching, object recognition, image stitching, 3D reconstruction, SLAM, etc. 
+% Matching local descriptors between images allows finding correspondences between them.
+
+% Advances like bag of visual words (BoVW), descriptor quantization, and descriptor matching with geospatial 
+% verification have improved the scalability and accuracy of local descriptor techniques.
+
+% CNN-based descriptors like LIFT are also gaining popularity, offering more discrimination but higher 
+% computation than traditional descriptors.
+
 
 
 
