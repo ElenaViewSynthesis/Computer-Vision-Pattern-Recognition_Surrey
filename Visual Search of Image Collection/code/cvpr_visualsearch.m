@@ -191,6 +191,7 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
          % better edges.
          % Compute gradient orientation and magnitude from the Canny edge map.
          % Build weighted histogram using magnitude for importance.
+         %%  MATLAB built-in Canny edge detector 
 
 
 
@@ -206,6 +207,11 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 % 2) Angular Radial Transformation (ART) - Region-Based Shape Descriptor
 % 3) Contour-Based Shape Descriptor
 % 4) 2D/3D Descriptor
+
+
+
+%% References:
+% https://www.vlfeat.org/overview/tut.html
 
                             %% Notes Taking
 % Feature Descriptors: These are representations of distinct features in an 
@@ -254,6 +260,8 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % Fractal Descriptors: These capture self-similarity or fractal properties in textures and images.
 
+%% Elkan k-means for fast visual word dictionary construction.
+
                                         %% LOCAL DESCRIPTORS
 % They capture the local visual information around interest points or keypoints in an image. 
 % This allows matching and comparison of local regions between images.
@@ -269,7 +277,65 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 % CNN-based descriptors like LIFT are also gaining popularity, offering more discrimination but higher 
 % computation than traditional descriptors.
+% ..............................................................................................................................
+%% Dense SIFT (DSIFT) & PHOW: Extracting dense SIFT features for image classification.
 
+%% Local Intensity Order Pattern (LIOP)(alternative to SIFT in keypoint matching): 
+
+%% Covariant Feature Detectors
+% (multiscale corner) Harris-Laplace    | (blob)  Hessian-Laplace & Hessian-Hessian | detectors
+
+%% Maximally Stable Extremal Regions (MSER): Extracting MSERs from an image as an alternative covariant feature detector.
+
+%% Image distance transform: Compute the image distance transform for fast part models and edge matching.
+
+%% Fisher vector and VLAD encodings: Compute global image encodings by pooling local image features with Fisher vectors and VLAD.
+
+% ..............................................................................................................................
+
+%% Gaussian Mixture Models (GMM) with Expectation Maximization (EM algorithm)
+
+%% Simple Linear Iterative Clustering (SLIC) algorithm for superpixel generation
+%% image distance transform: PEGASOS, floating point K-means, homogeneous kernel maps.
+%% Detection Error Trade-off (DET) curves.
+
+
+% Trivial notes:
+% "Estimation of Feature Orientation" refers to the process of determining the dominant orientation of a local image feature.
+% Local Feature Region: The process begins with the selection of a local region around the feature point of interest. This region can be a small patch or a neighborhood of pixels.
+
+% Gradient Computation: Within this local region, the next step is to compute the gradient information. 
+% The gradient is calculated to determine how the pixel values change in both the x and y directions. 
+% The gradient magnitude represents the strength of the changes, while the gradient angle indicates 
+% the direction of the changes. Common methods for gradient computation include using Sobel operators or 
+% other convolution filters.
+
+% Accumulating Gradient Histogram: Once the gradients are computed, a histogram is created to accumulate 
+% the gradient orientations. Each pixel's gradient angle contributes to a particular bin in the histogram.
+
+% Dominant Orientation: The bin with the highest count (peak) in the histogram is considered the dominant 
+% orientation of the feature. This dominant orientation represents the overall direction in which 
+% the intensity changes are most prominent within the local region.
+
+% Orientation Assignment: The dominant orientation is assigned to the feature point, which makes the 
+% feature description rotation-invariant. This means that even if the local feature patch is rotated, 
+% the assigned orientation ensures that the feature description is consistent.
+
+% Orientation Histogram: In some cases, multiple dominant orientations might be assigned if there are 
+% multiple peaks in the gradient histogram. This can be useful in situations where a feature is not 
+% strongly oriented in a single direction.
+
+%%  By assigning a dominant orientation to a feature, these SIFT, SURF algorithms ensure that 
+%% the feature's representation is invariant to rotations.
+
+%% Support Vector Machine (SVM): Binary classifier and check its convergence by plotting various statistical info.
+
+% Agglomerative Information Bottleneck (AIB): Cluster discrete data based on the mutual 
+% information between the data and class labels.
+
+%% Forests of kd-trees: Approximate nearest neighbour queries in high dimensions using an optimized forest of kd-trees.
+
+% Github pull request: Added Extra Notes for Future Computer Vision Algorithm Implementation
 
 
 
