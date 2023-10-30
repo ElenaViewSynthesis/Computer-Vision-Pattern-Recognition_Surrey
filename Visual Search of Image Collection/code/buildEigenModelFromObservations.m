@@ -42,47 +42,35 @@ function EigenM = buildEigenModelFromObservations(observationsFEAT)
     % the amount of variance explained by each principal component.
     [U V] = eig(DIMENSIONAL_COVARIANCE_MATRIX);
     
-    % here
+    % Sort Eigenvectors & Eigenvalues by eigenvalue (desc)
+    % for computing the percentage of variance explained by each eigenvalue, as it 
+    % represents the total variance in the data.
+    linearColumnVector = V * ones(size(V,2),1); % contains the sum of eigenvectors of V.
+    S = [linearColumnVector U']; % The transposition (U') is necessary to ensure that the eigenvectors are stored as columns.
+    S = flipud(sortrows(S,1)); % flips the order of the rows in the sorted matrix obtained in the previous step, effectively reversing the order from ascending to descending.
     
-
-% ReduceDimensionalityWithPCA
-
-
-                        %% REPORT NOTES
-% try different quantization and indentify the best approach with average
-% precision
-% Compare the results
-% Evaluate everything
-% only need to labe the first class only that we search
-
-% Observation of dataset
-% Remove some images from the image categories
-% Compare the results with AP & MAP & PR curve
-
-% Ex: histogram worked better for building images but not 
-% Pr curve for every class, compare the values
-
-% Descriptor must be invariant of : - instance of the object
-%                                   - we dont expect 2 diff images of cows
-%                                   to have the same edges.
-                                    % similar distribution of colour
-
-% the object of interest
-%% INTERPRET Results
-
-% SVM multilabel
-
-
-%deflate = 10;
+    % U contains the eigenvectors corresponding to the eigenvalues in descending order.
+    U = S(:,2:end)'; % selects all columns of the S starting from 2nd col to the last => each column of the submatrix becomes a row in U.
+    V = S(:,1); % Isolate the sorted eigenvalues (in descending order) from S.
+    % eigenvalues represent the amount of variance explained by each corresponding principal component (eigenvector). 
     
- %   e_val=e_val(1:deflate);
-  %  e_vec=e_vec(:,1:deflate);
-    
-   % ALLFEAT = ALLFEAT-repmat(size(m_ALLFEAT,1),1);
-    %EM = (e_vec'*ALLFEAT')';
+    EigenM.vct = U; % Store the sorted eigenvectors of U to the eigenmodel structure field.
+    EigenM.val = V; % Assign the sorted eigenvalues.
 
 
 
+                                    %% Extra Notes for REVISION
+    % Eigenvalues (D): eig() returns a diagonal matrix (D) containing the eigenvalues of the input matrix. 
+    % The eigenvalues represent the scaling factors by which the eigenvectors are stretched or shrunk.
+    % Each eigenvalue corresponds to a specific eigenvector.
 
+    % Eigenvectors (V): The eig() function also returns a matrix (V) where each column represents an 
+    % eigenvector corresponding to the eigenvalues in matrix D. These eigenvectors are often normalized
+    % to have a magnitude of 1. 
 
+    % In PCA, the eigenvalues and eigenvectors of the covariance matrix represent the principal components 
+    % of the data. The eigenvectors define new coordinate axes (principal components) in the data space,
+    % while the eigenvalues indicate the amount of variance along each principal component. By sorting 
+    % the eigenvalues in descending order, you can identify the most significant principal components, 
+    % which can be used for dimensionality reduction and feature extraction.
 end
