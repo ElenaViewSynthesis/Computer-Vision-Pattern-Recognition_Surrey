@@ -1,4 +1,5 @@
 %% Compute distance in standard deviations of FEAT observations from Eigen Model
+%% how data points deviate from the typical variations captured by the eigenmodel.
 %
 %% Input:               E       - Eigenmodel to deflate
 %%                      method  - Deflation method to use
@@ -12,11 +13,15 @@
 %% (c) John Collomosse 2010  (J.Collomosse@surrey.ac.uk)
 function EigenM = PCA_DeflateEigenmodel(E, method, param)
     switch method
-        case 'keepn'
-            % here
+        case 'keepn'                                   
+            EigenM.val = EigenM.val(1:param); % Select only the first 'param' eigenvalues, the MOST significant ones.
+            EigenM.vct = EigenM.vct(:,1:param); % Select only the first 'param' columns, the MOST significant eigenvectors.
         case 'keepf'
-            %here
-
+            totalenergy = sum(abs(EigenM.val)); % total energy represents the total variance in the data.
+            currentenergy = 0;                  % track how much energy has been accumulated.
+            rank = 0;                           % counter of eigenvalues that reach the specified energy threshold.
+        
+            % for loop here
 
     end
 
