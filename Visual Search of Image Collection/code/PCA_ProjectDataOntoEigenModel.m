@@ -1,5 +1,3 @@
-%% References: https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance
-
 %% Project data onto eigenmodel basis
 %% 
 %% INPUT:               E   - Eigenmodel to project points
@@ -8,17 +6,16 @@
 %% OUTPUT:              pobs - Projected data
 %
 %% (c) John Collomosse 2010
-function  pobs = PCA_ProjectDataOntoEigenModel(observationsFEAT, E)
-    meanCenteredFEATobservations = observationsFEAT; % WORK here
+function  projectedObs = PCA_ProjectDataOntoEigenModel(observationsFEAT, EigenM)
     
+    meanCenteredFEATobservations = observationsFEAT - repmat(EigenM.MeanPerDimension, 1, size(observationsFEAT,2));
+    projectedObs = EigenM.vct' * meanCenteredFEATobservations;
     
-
 % The translated data will be used for PCA & the principal components (eigenvectors) obtained from this
 % data represent the directions of *Maximum Variance* around the origin.
 
 
-% Elbow Graph
-
+% Elbow Graph to plot
 
 end
 
