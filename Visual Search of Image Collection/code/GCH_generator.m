@@ -1,4 +1,4 @@
-function H=GCH_generator(img,quantiz_level)
+function Histo=GCH_generator(img,quantiz_level)
 % .
 % https://www.youtube.com/watch?v=uqeOrtAzSyU
 % .
@@ -25,11 +25,16 @@ bin = qimg(:,:,1)*quantiz_level^2 + qimg(:,:,2)*quantiz_level^1 + qimg(:,:,3);
 
 vector_values = reshape(bin,1,size(bin,1)*size(bin,2));
 % Create a histogram of Q^3 bins.
-H = hist(vector_values,quantiz_level^3);
+% H = hist(vector_values, quantiz_level^3);
+h = histogram(vector_values, quantiz_level^3, 'Normalization', 'probability').Values;
+Histo = h;
+
 % Normalise the histogram so the area under it sums to 1.
-H = H ./sum(H);
-figure(4);
-histogram(H);
+% H = H ./sum(H);
+
+
+%figure(4);
+% histogram(H);
 
 % For Testing & Visualization Purposes
 %figure(4);
