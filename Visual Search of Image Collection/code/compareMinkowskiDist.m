@@ -1,16 +1,50 @@
-function MinkoDis = compareMinkowskiDist()
-% A generalization of both Euclidean and Manhattan distances, the Minkowski distance 
+%% References: https://en.wikipedia.org/wiki/Euclidean_distance#Squared_Euclidean_distance
+%% check GPT \left(\sum_{i=1}^n |x_i-y_i|^p\right)^{1/p}
+
+
+% Input:
+    % FeatureVect1, FeatureVect2 - Vectors or arrays for which the Minkowski distance is to be calculated.
+    % p - The order of the Minkowski distance.
+
+function MinkoDis = compareMinkowskiDist(FeatureVect1, FeatureVect2, p)
+% A generalization of Euclidean, Manhattan, and Chebyshev distances.
 % is controlled by a parameter 'p.' When p=2, it's equivalent to the Euclidean distance, 
 % and when p=1, it's equivalent to the Manhattan distance.
 
+    
 
+    % Calculate the absolute differences between corresponding elements of A and B.
+    absolute_diff = abs(FeatureVect1 - FeatureVect2);
 
-                    %% check GPT
-               % \left(\sum_{i=1}^n |x_i-y_i|^p\right)^{1/p}
-                  
+    % Raise each absolute difference to the power of p.
+    powered_diff = absolute_diff.^p;
 
+    % Sum up all the powered differences.
+    sum_diff = sum(powered_diff);
 
+    % Take the p-th root of the sum to obtain the Minkowski distance.
+    MinkoDis = sum_diff^(1/p);
 end
+
+
+
+
+
+%% Run in visualsearch
+% Calculate the Minkowski distance with p=1 (Manhattan distance).
+%manhattan_distance = minkowski_distance(A, B, 1);
+%disp(manhattan_distance);
+
+% Calculate the Minkowski distance with p=2 (Euclidean distance).
+%euclidean_distance = minkowski_distance(A, B, 2);
+%disp(euclidean_distance);
+
+% You can also calculate the distance with other values of p.
+
+
+
+
+
 
                                             %% Common Distance Metrics
 % Cosine Similarity: This metric measures the cosine of the angle between two non-zero vectors. 
