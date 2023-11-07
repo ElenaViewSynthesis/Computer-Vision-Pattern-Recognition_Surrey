@@ -93,7 +93,13 @@ for i=1:NIMG
     if applyPCA
         thedst = compareMahalanobis(query, candidate, EigenModel.val);
     else
-    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT                        
+    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT
+
+    % Calculate a 3rd-order Minkowski distance (p=3) aka cubic distance metric. 
+    % Measures the dissimilarity between vectors with a higher sensitivity to extreme differences.
+    
+    % thedst = compareMinkowskiDist(query, candidate, 3); %% UNCOMMENT
+
     thedst=cvpr_compare(query, candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors with *EUCLIDEAN*.
                                            % *The query image with a
                                            % descriptor that matches the
