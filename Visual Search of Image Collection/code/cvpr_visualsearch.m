@@ -44,13 +44,17 @@ disp(categNum);
 %% Compute Eigen Model -> Project Data to Eigenmodel Basis
 RUN_PCA_on_ALLFEAT=[];
 applyPCA = false;
+energyToRetain = 0.85;
 if applyPCA
-    inputFeatureDescriptorsPCA = ALLFEAT';      % switching rows and columns.
+    inputFeatureDescriptorsPCA = ALLFEAT';      % switching rows and columns, r represent samples, and col - features (dimensions).
+    fprintf( 'PCA before', size(inputFeatureDescriptorsPCA, 1), size(inputFeatureDescriptorsPCA, 2));
+    
+    [reducedFeatureDescriptorsAfterPCA, EigenModel] = PerformEigenPCA(inputFeatureDescriptorsPCA, 'keepf', energyToRetain);
+            
+    % Transpose back to its original format, with rows representing samples and columns representing features.
+    ALLFEAT = reducedFeatureDescriptorsAfterPCA';               % Update with reduced dimensions. 
+    fprintf('Applied PCA: ', size(reducedFeatureDescriptorsAfterPCA,1), size(reducedFeatureDescriptorsAfterPCA,2));
 end
-
-
-
-
 
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
@@ -66,7 +70,7 @@ queryimg=floor(420);    % rand()*NIMG % index of a random image
 % Lecture Slides
 %eigenB = eigenBuild(ALLFEAT');
 %eigenDef = EigenDeflate(eigenB, "keepn",3);
-%ALLFEATONPCA = EigenPRoject(ALLFEAT', eigenDef)';
+%ALLFEATONPCA = EigenProject(ALLFEAT', eigenDef)';
 
 %plot3(ALLFEATONPCA(:,1), ALLFEATONPCA(:,2), ALLFEATONPCA(:,3), 'bx');
 %xlabel('EigenV1');
@@ -82,16 +86,22 @@ queryimg=floor(420);    % rand()*NIMG % index of a random image
 %% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
 for i=1:NIMG
-    candidate=ALLFEAT(i,:);        
-    query=ALLFEAT(queryimg,:);
-    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT
-  
-    % compare with mahalanobis on all features
+    candidate = ALLFEAT(i,:);        
+    query = ALLFEAT(queryimg,:);
     
-                                           
+    % Compare with mahalanobis on all features
+    if applyPCA
+        thedst = compareMahalanobis(query, candidate, EigenModel.val);
+    else
+    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT                        
     thedst=cvpr_compare(query, candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors with *EUCLIDEAN*.
-    dst=[dst ; [thedst i]];                % *The query image with a descriptor that matches the query perfectly,
-                                           %  ex, distance zero 
+                                           % *The query image with a
+                                           % descriptor that matches the
+                                           % query perfectly, then distance zero.
+    end
+    %% FIX
+    dst=[dst ; [thedst i]]; % ; [thedst i allfiles(i).class allfiles(i).imgNum]];               
+                                           
 end
 % The smaller the distance, the more similar the image is to the query.
 dst=sortrows(dst,1);  % sort the results
