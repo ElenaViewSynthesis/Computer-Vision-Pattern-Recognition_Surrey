@@ -1,39 +1,14 @@
-%% EEE3032 - Computer Vision and Pattern Recognition (ee3.cvpr)
-%%
-%% cvpr_visualsearch.m
-%% Skeleton code provided as part of the coursework assessment
-%%
-%% This code will load in all descriptors pre-computed (by the
-%% function cvpr_computedescriptors) from the images in the MSRCv2 dataset.
-%%
-%% It will pick a descriptor at random and compare all other descriptors to
-%% it - by calling cvpr_compare.  In doing so it will rank the images by
-%% similarity to the randomly picked descriptor.  Note that initially the
-%% function cvpr_compare returns a random number - you need to code it
-%% so that it returns the Euclidean distance or some other distance metric
-%% between the two descriptors it is passed.
-%%
-%% (c) John Collomosse 2010  (J.Collomosse@surrey.ac.uk)
-%% Centre for Vision Speech and Signal Processing (CVSSP)
-%% University of Surrey, United Kingdom
-
 close all;
 clear all;
-%% Uses the extracted image descriptors to run a visual search.
 
-%% Edit the following line to the folder you unzipped the MSRCv2 dataset to
 DATASET_FOLDER = '/MATLAB Drive/CW/msrc_objcategimagedatabase_v2/MSRC_ObjCategImageDatabase_v2';
-
-%% Folder that holds the results...
 DESCRIPTOR_FOLDER = '/MATLAB Drive/CW/descriptors';
-%% and within that folder, another folder to hold the descriptors
-%% we are interested in working with
 DESCRIPTOR_SUBFOLDER='globalRGBhisto';
 
 
 %% 1) Load all the descriptors into "ALLFEAT"
 %% each row of ALLFEAT is a descriptor (is an image)
-classesOfImages = []; %% Need to compute the number of classes in our dataset
+classesOfImages = []; % Need to compute the number of classes in the dataset
 ALLFEAT=[];
 ALLFILES=cell(1,0);
 ctr=1;
@@ -45,7 +20,7 @@ for filenum=1:length(allfiles)
     img=double(imread(imgfname_full));
 
     thesefeat=[];
-    featfile=[DESCRIPTOR_FOLDER,'/',DESCRIPTOR_SUBFOLDER,'/',fname(1:end-4),'.mat'];%replace .bmp with .mat
+    featfile=[DESCRIPTOR_FOLDER,'/',DESCRIPTOR_SUBFOLDER,'/',fname(1:end-4),'.mat'];
     load(featfile,'F');
 
     ALLFILES{ctr}=imgfname_full;
@@ -62,24 +37,59 @@ for filenum=1:length(allfiles)
     ctr=ctr+1;
 end
 
-%CATEGORIESh = histogram(classesOfImages).Values;
-%CATNum = length(CATEGORIESh);
-%disp(CATNum);
+CATEGORIEShisto = histogram(classesOfImages).Values;
+categNum = length(CATEGORIEShisto);
+disp(categNum);
+
+%% Compute Eigen Model -> Project Data to Eigenmodel Basis
+RUN_PCA_on_ALLFEAT=[];
+applyPCA = false;
+if applyPCA
+    inputFeatureDescriptorsPCA = ALLFEAT';      % switching rows and columns.
+end
+
+
+
+
+
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
 NIMG=size(ALLFEAT,1);           % number of images in collection
-queryimg=floor(rand()*NIMG);    % index of a random image
+queryimg=floor(420);    % rand()*NIMG % index of a random image
+% floor(420);
 
 %% CHANGE random
 %% Add a nested for loop for class indices
 
 
+
+% Lecture Slides
+%eigenB = eigenBuild(ALLFEAT');
+%eigenDef = EigenDeflate(eigenB, "keepn",3);
+%ALLFEATONPCA = EigenPRoject(ALLFEAT', eigenDef)';
+
+%plot3(ALLFEATONPCA(:,1), ALLFEATONPCA(:,2), ALLFEATONPCA(:,3), 'bx');
+%xlabel('EigenV1');
+%ylabel('EigenV2');
+%zlabel('EigenV3');
+
+
+%% Run Image Queries here
+ 
+
+
+
 %% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
 for i=1:NIMG
-    candidate=ALLFEAT(i,:);        % EUCLIDEAN
+    candidate=ALLFEAT(i,:);        
     query=ALLFEAT(queryimg,:);
-    thedst=cvpr_compare(query,candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors.
+    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT
+  
+    % compare with mahalanobis on all features
+    
+                                           
+    thedst=cvpr_compare(query, candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors with *EUCLIDEAN*.
     dst=[dst ; [thedst i]];                % *The query image with a descriptor that matches the query perfectly,
                                            %  ex, distance zero 
 end
@@ -149,8 +159,7 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 % .                     PCA over dataset
 % Write code for eigen model using Eigen_build function for PCA application
 %% Mahalanobis distance
-%
-% LABS cvpr code
+
 
 
 
