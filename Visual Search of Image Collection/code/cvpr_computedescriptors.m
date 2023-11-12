@@ -12,7 +12,7 @@ DESCRIPTOR_SUBFOLDER_GLOBAL='globalRGBhisto';
 DESCRIPTOR_SUBFOLDER_SPATIAL_COLOUR_GRID = 'SpatialColourGrid';
 DESCRIPTOR_SUBFOLDER_SPATIAL_TEXTURE_GRID = 'SpatialGridTexture'; 
 DESCRIPTOR_SUBFOLDER_EOH = 'EdgeOrientationHisto';
-DESCRIPTOR_SUBFOLDER_MERGE_CEOH = 'ceoh';   %Colour+Edges
+DESCRIPTOR_SUBFOLDER_MERGE_CEOH = 'ceoh';       % Colour+Edges
 
 
 allfiles=dir (fullfile([DATASET_FOLDER,'/Images/*.bmp']));
@@ -41,16 +41,16 @@ for filenum=1:length(allfiles)
     %F = GCH_generator(img, QuantzLevel);
 
     % Grid Colour histogram
-    fout=[OUT_FOLDER,'/',DESCRIPTOR_SUBFOLDER_SPATIAL_COLOUR_GRID,'/',fname(1:end-4),'.mat'];
-    F = gridColourHistoConstructor(img, grids);
+    %fout=[OUT_FOLDER,'/',DESCRIPTOR_SUBFOLDER_SPATIAL_COLOUR_GRID,'/',fname(1:end-4),'.mat'];
+    %F = gridColourHistoConstructor(img, grids);
     
     % Spatial Grid Texture
     %fout=[OUT_FOLDER,'/',DESCRIPTOR_SUBFOLDER_SPATIAL_TEXTURE_GRID,'/',fname(1:end-4),'.mat'];
-    %F = gridColourHistoConstructor(img, grids, spatialAngularLevel, spatialThreshold);
+    %F = gridTextureConstructor(img, grids, spatialAngularLevel, spatialThreshold);
     
     % CEOH
-    %fout=[OUT_FOLDER,'/',DESCRIPTOR_SUBFOLDER_MERGE_CEOH,'/',fname(1:end-4),'.mat'];
-    %F = gridColourHistoConstructor(img, grids, spatialAngularLevel, spatialThreshold);
+    fout=[OUT_FOLDER,'/',DESCRIPTOR_SUBFOLDER_MERGE_CEOH,'/',fname(1:end-4),'.mat'];
+    F = mergedCEOH(img, grids, spatialAngularLevel, spatialThreshold);
 
     save(fout,'F');
     toc
