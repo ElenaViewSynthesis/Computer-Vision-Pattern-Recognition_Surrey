@@ -3,12 +3,20 @@ clear all;
 
 DATASET_FOLDER = '/MATLAB Drive/CW/msrc_objcategimagedatabase_v2/MSRC_ObjCategImageDatabase_v2';
 DESCRIPTOR_FOLDER = '/MATLAB Drive/CW/descriptors';
-DESCRIPTOR_SUBFOLDER='globalRGBhisto';
+
+%% UNCOMMENT for each descriptor
+%SUBFOLDER = 'globalRGBhisto';
+%SUBFOLDER = 'SpatialColourGrid';       %Run with respective to computed DESC
+%SUBFOLDER = 'SpatialGridTexture'; 
+%SUBFOLDER = 'EdgeOrientationHisto';
+SUBFOLDER = 'ceoh';
+%SUBFOLDER = 'BagsOfWords';
 
 
-%% 1) Load all the descriptors into "ALLFEAT"
-%% each row of ALLFEAT is a descriptor (is an image)
+% Step 1
 classesOfImages = []; % Need to compute the number of classes in the dataset
+categories = {"farm", "tree", "building", "aeroplane", "cow", "selfie", "car", "bike", "sheep", "flower", "sign", "bird", "book", "bench", "cat", "dog", "road", "water", "people", "coast"};
+ImageCategories = [];
 ALLFEAT=[];
 ALLFILES=cell(1,0);
 ctr=1;
@@ -16,14 +24,26 @@ allfiles=dir (fullfile([DATASET_FOLDER,'/Images/*.bmp']));
 for filenum=1:length(allfiles)
     fname=allfiles(filenum).name;
     imgfname_full=([DATASET_FOLDER,'/Images/',fname]);
+    
+    %% Extract the numerical category identifier from the start of the filename for precision-recall analysis.
+    % Use regular expression to extract the category number from the filename.
+    % Assuming the category number is always at the beginning followed by an underscore.
+    categoryMatch = regexp(fname, '^\d+', 'match');
+    if ~isempty(categoryMatch)
+        ImageCategories(filenum) = str2double(categoryMatch{1});
+    else
+        ImageCategories(filenum) = NaN; % Assign NaN for filenames that do not match the expected pattern.
+    end
 
-    img=double(imread(imgfname_full));
+
+    img=double(imread(imgfname_full))./255;
 
     thesefeat=[];
-    featfile=[DESCRIPTOR_FOLDER,'/',DESCRIPTOR_SUBFOLDER,'/',fname(1:end-4),'.mat'];
+    featfile=[DESCRIPTOR_FOLDER,'/',SUBFOLDER,'/',fname(1:end-4),'.mat'];
+    % load every descr to allfeatmatrix
     load(featfile,'F');
-
-    ALLFILES{ctr}=imgfname_full;
+    % Every row within ALLFEAT serves as a descriptor, representing an individual image.
+    ALLFILES{ctr} = imgfname_full;
     ALLFEAT=[ALLFEAT ; F];
     
     % Check the second character of the filename whether it is a digit or a
@@ -37,45 +57,58 @@ for filenum=1:length(allfiles)
     ctr=ctr+1;
 end
 
+%% UNCOMMENT
+IndexToSearch = [300 350 380 436 440 470 510 537 570 4 62 80 100 128 180 218 268 277 333];
+
 CATEGORIEShisto = histogram(classesOfImages).Values;
 categNum = length(CATEGORIEShisto);
-disp(categNum);
+disp(categNum); % display number of all categories (20) of images in a separate bin with each its total num of images.
 
-%% Compute Eigen Model -> Project Data to Eigenmodel Basis
+
+%% Project image descriptors into *lower dimensional space*
+%                      PCA over dataset
+% Write code for eigen model using Eigen_build function for PCA application
+%% Mahalanobis distance
+% Compute Eigen Model -> Project Data to Eigenmodel Basis
+
 RUN_PCA_on_ALLFEAT=[];
-applyPCA = false;
+applyPCA = true; %to perform PCA
 energyToRetain = 0.85;
-if applyPCA
-    inputFeatureDescriptorsPCA = ALLFEAT';      % switching rows and columns, r represent samples, and col - features (dimensions).
-    fprintf( 'PCA before', size(inputFeatureDescriptorsPCA, 1), size(inputFeatureDescriptorsPCA, 2));
+if applyPCA                                     %% Lecture 7, slide 12
+    inputFeatureDescriptorsPCA = ALLFEAT;      % switching rows and columns, r represent samples, and col - features (dimensions).
     
     [reducedFeatureDescriptorsAfterPCA, EigenModel] = PerformEigenPCA(inputFeatureDescriptorsPCA, 'keepf', energyToRetain);
-            
     % Transpose back to its original format, with rows representing samples and columns representing features.
-    ALLFEAT = reducedFeatureDescriptorsAfterPCA';               % Update with reduced dimensions. 
-    fprintf('Applied PCA: ', size(reducedFeatureDescriptorsAfterPCA,1), size(reducedFeatureDescriptorsAfterPCA,2));
+    % Update with reduced dimensions. 
+    RUN_PCA_on_ALLFEAT = reducedFeatureDescriptorsAfterPCA;  
+    E = EigenModel;
+    %fprintf('REDUCED DIMENSIONS: ', size(reducedFeatureDescriptorsAfterPCA));
+    %clear inputFeatureDescriptorsPCA reducedFeatureDescriptorsAfterPCA;
 end
 
+                    % FIX
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
-NIMG=size(ALLFEAT,1);           % number of images in collection
-queryimg=floor(420);    % rand()*NIMG % index of a random image
-% floor(420);
+NIMG=size(ALLFEAT,1);                           % number of images in collection
+queryimg=537;    % rand()*NIMG           % index of a random image
+% floor(537);
+% floor(421);
 
 %% CHANGE random
 %% Add a nested for loop for class indices
 
 
 
-% Lecture Slides
+% Lecture Slides (not for use)
 %eigenB = eigenBuild(ALLFEAT');
 %eigenDef = EigenDeflate(eigenB, "keepn",3);
 %ALLFEATONPCA = EigenProject(ALLFEAT', eigenDef)';
 
-%plot3(ALLFEATONPCA(:,1), ALLFEATONPCA(:,2), ALLFEATONPCA(:,3), 'bx');
-%xlabel('EigenV1');
-%ylabel('EigenV2');
-%zlabel('EigenV3');
+%% UNCOMMENT
+%plot3(reducedFeatureDescriptorsAfterPCA(:,1), reducedFeatureDescriptorsAfterPCA(:,2), reducedFeatureDescriptorsAfterPCA(:,3), 'bx');
+%xlabel('EigenVector1');
+%ylabel('EigenVector2');
+%zlabel('EigenVector3');
 
 
 %% Run Image Queries here
@@ -83,24 +116,32 @@ queryimg=floor(420);    % rand()*NIMG % index of a random image
 
 
 
+
+% L1 Norm = Manhattan distance
+% Cosine Similarity
 %% 3) Compute the distance between the descriptor of the query image & the descriptor of each image
 dst=[];
+r=[];
+p=[];
+
 for i=1:NIMG
     candidate = ALLFEAT(i,:);        
     query = ALLFEAT(queryimg,:);
     
     % Compare with mahalanobis on all features
     if applyPCA
-        thedst = compareMahalanobis(query, candidate, EigenModel.val);
+        thedst = compareMahalanobis(query, candidate, E.val); %TRANSPOSE E.val inside Mahal function. 
     else
-    % thedst = compareL1Norm_Manhattan(query, candidate); %% UNCOMMENT
+        %% UNCOMMENT
+        % thedst = compareL1Norm_Manhattan(query, candidate); 
 
     % Calculate a 3rd-order Minkowski distance (p=3) aka cubic distance metric. 
     % Measures the dissimilarity between vectors with a higher sensitivity to extreme differences.
-    
-    % thedst = compareMinkowskiDist(query, candidate, 3); %% UNCOMMENT
+        
+        %% UNCOMMENT
+        % thedst = compareMinkowskiDist(query, candidate, 3);
 
-    thedst=cvpr_compare(query, candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors with *EUCLIDEAN*.
+        thedst=cvpr_compare(query, candidate); % Compare the query descriptor AGAINST to each of the 591 image descriptors with *EUCLIDEAN*.
                                            % *The query image with a
                                            % descriptor that matches the
                                            % query perfectly, then distance zero.
@@ -110,17 +151,19 @@ for i=1:NIMG
                                            
 end
 % The smaller the distance, the more similar the image is to the query.
-dst=sortrows(dst,1);  % sort the results
+dst=sortrows(dst,1);
 
 
 %% CHANGE This to specific IMAGE
-classImgToQuery = floor(301); %selfies
+%classImgToQuery = floor(301); %selfie
+classImgToQuery = 537;
 
 
 
 % put all in a loop ....
 
-% Compute and plot the PRECISION-RECALL Curve for the top 10 results.
+
+% Compute PRECISION-RECALL Curve for the top 10 results.
 precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
 
 % call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
@@ -143,8 +186,7 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 %% *COMBINE* EOH & COLOUR
 
-% https://www.youtube.com/watch?v=nsyf-S6iZLM
-% https://www.youtube.com/watch?v=6tKPgIH_Uuc
+
 
 
 
@@ -152,35 +194,21 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 
 %% 4) Visualise the results
-%% These may be a little hard to see using imgshow
-%% If you have access, try using imshow(outdisplay) or imagesc(outdisplay)
 
-
-
-%SHOW=15; % Show top 15 results
-%dst=dst(1:SHOW,:);
-%outdisplay=[];
-%for i=1:size(dst,1)
-%   img=imread(ALLFILES{dst(i,2)});
-%   img=img(1:2:end,1:2:end,:); % make image a quarter size
-%   img=img(1:81,:,:); % crop image to uniform size vertically (some MSVC images are different heights)
-%   outdisplay=[outdisplay img];
-%end
+DISPLAY=15;
+dst=dst(1:DISPLAY,:);
+outdisplay=[];
+for i=1:size(dst,1)
+   img=imread(ALLFILES{dst(i,2)});
+   img=img(1:2:end,1:2:end,:); 
+   img=img(1:81,:,:); 
+   outdisplay=[outdisplay img];
+end
 %imshow(outdisplay);
-%imagesc(outdisplay);
-%axis off;
+% imagesc(outdisplay);  % not use
 
-
-%% Project image descriptors into *lower dimensional space*
-% .                     PCA over dataset
-% Write code for eigen model using Eigen_build function for PCA application
-%% Mahalanobis distance
-
-
-
-
-% L1 Norm = Manhattan distance
-% Cosine Similarity
+figure, imshow(outdisplay);
+axis off;
 
 
 
@@ -360,7 +388,6 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 
 %% Forests of kd-trees: Approximate nearest neighbour queries in high dimensions using an optimized forest of kd-trees.
 
-% Github pull request: Added Extra Notes for Future Computer Vision Algorithm Implementation
 
 
 
