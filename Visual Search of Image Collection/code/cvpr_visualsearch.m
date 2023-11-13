@@ -1,3 +1,7 @@
+%% References:
+% https://www.vlfeat.org/overview/tut.html
+% https://www.youtube.com/watch?v=nsyf-S6iZLM
+% https://www.youtube.com/watch?v=6tKPgIH_Uuc
 close all;
 clear all;
 
@@ -58,7 +62,7 @@ for filenum=1:length(allfiles)
 end
 
 %% UNCOMMENT
-IndexToSearch = [300 350 380 436 440 470 510 537 570 4 62 80 100 128 180 218 268 277 333];
+IndexToSearch = [300 350 380 436 440 470 510 537 570 4 62 80 100 128 179 181 218 268 277 333];
 
 CATEGORIEShisto = histogram(classesOfImages).Values;
 categNum = length(CATEGORIEShisto);
@@ -72,9 +76,9 @@ disp(categNum); % display number of all categories (20) of images in a separate 
 % Compute Eigen Model -> Project Data to Eigenmodel Basis
 
 RUN_PCA_on_ALLFEAT=[];
-applyPCA = true; %to perform PCA
+applyPCA = false; %to perform PCA
 energyToRetain = 0.85;
-if applyPCA                                     %% Lecture 7, slide 12
+if applyPCA                                    % Lecture 7, slide 12
     inputFeatureDescriptorsPCA = ALLFEAT;      % switching rows and columns, r represent samples, and col - features (dimensions).
     
     [reducedFeatureDescriptorsAfterPCA, EigenModel] = PerformEigenPCA(inputFeatureDescriptorsPCA, 'keepf', energyToRetain);
@@ -82,23 +86,23 @@ if applyPCA                                     %% Lecture 7, slide 12
     % Update with reduced dimensions. 
     RUN_PCA_on_ALLFEAT = reducedFeatureDescriptorsAfterPCA;  
     E = EigenModel;
-    %fprintf('REDUCED DIMENSIONS: ', size(reducedFeatureDescriptorsAfterPCA));
     %clear inputFeatureDescriptorsPCA reducedFeatureDescriptorsAfterPCA;
 end
 
-                    % FIX
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
-NIMG=size(ALLFEAT,1);                           % number of images in collection
-queryimg=537;    % rand()*NIMG           % index of a random image
+NIMG=size(ALLFEAT,1);                    % number of images in collection
+queryimg=537;                            % index of a random image
 % floor(537);
-% floor(421);
+% floor(431);
 
-%% CHANGE random
-%% Add a nested for loop for class indices
+ALLDESCRIPTORS = ALLFEAT;
+numImages = size(ALLDESCRIPTORS, 1);
+% Calculate the frequency of each image category within the dataset.
+CategoryHistogram = histogram(ImageCategories).Values;
+TotalCategories = length(CategoryHistogram);
 
-
-
+%RUN_PCA_on_ALLFEAT
 % Lecture Slides (not for use)
 %eigenB = eigenBuild(ALLFEAT');
 %eigenDef = EigenDeflate(eigenB, "keepn",3);
@@ -112,7 +116,72 @@ queryimg=537;    % rand()*NIMG           % index of a random image
 
 
 %% Run Image Queries here
- 
+categoryConfusionMatrix = zeros(TotalCategories);
+
+allCategoryPrecision = [];
+allCategoryRecall = [];
+averagePrecisionValues = zeros(1, TotalCategories);
+
+
+% Add a nested for loop for each class indices.
+% Compute pairwise distances for all images.
+pairwiseDistances = zeros(numImages, numImages);
+for i = 1:numImages
+    for j = i + 1:numImages
+        if applyPCA
+            % If PCA is applied, use Mahalanobis distance with eigenvalues
+            pairwiseDistances(i, j) = compareMahalanobis(ALLDESCRIPTORS(i, :), ALLDESCRIPTORS(j, :), E.val);
+        else
+            % If PCA is not applied, use cvpr_compare
+            pairwiseDistances(i, j) = cvpr_compare(ALLDESCRIPTORS(i, :), ALLDESCRIPTORS(j, :));
+        end
+         pairwiseDistances(j, i) = pairwiseDistances(i, j); % Symmetric matrix
+    end
+end
+
+% Iterate over each category for PR computation.
+for categoryIndex = 1:TotalCategories
+    queryImageIndex = IndexToSearch(categoryIndex);
+
+    % Ensure the queryImageIndex is within the range of numImages
+    if queryImageIndex > numImages
+        continue; % Skip this iteration if queryImageIndex is out of range
+    end
+    
+    % Sort distances for the current query image.
+    [sortedDistances, sortedIndices] = sort(pairwiseDistances(queryImageIndex, :));
+    sortedCategories = ImageCategories(sortedIndices);
+    
+    correctCategoryHits = cumsum(sortedCategories == categoryIndex);
+    totalRelevantImages = CategoryHistogram(categoryIndex);
+
+    precisionAtN = correctCategoryHits ./ (1:numImages);
+    recallAtN = correctCategoryHits / totalRelevantImages;
+    
+    correctHits = sortedCategories == categoryIndex;
+    averagePrecision = sum(precisionAtN(correctHits)) / totalRelevantImages;
+    
+    averagePrecisionValues(categoryIndex) = averagePrecision;
+    
+    allCategoryPrecision = [allCategoryPrecision; precisionAtN];
+    allCategoryRecall = [allCategoryRecall; recallAtN];
+end
+
+meanCategoryPrecision = mean(allCategoryPrecision);
+meanCategoryRecall = mean(allCategoryRecall);
+
+% Visualization and analysis code can be added here
+% This might include plotting the precision-recall curves,
+% displaying the confusion matrix, etc.
+
+ % Plot the average precision-recall curve
+figure(3);
+plot(meanCategoryRecall, meanCategoryPrecision, 'LineWidth', 2, 'Marker','o');
+title('Average Precision-Recall Curve');
+xlabel('Recall');
+ylabel('Precision');
+grid on;
+
 
 
 
@@ -124,20 +193,22 @@ dst=[];
 r=[];
 p=[];
 
+
 for i=1:NIMG
     candidate = ALLFEAT(i,:);        
     query = ALLFEAT(queryimg,:);
     
+    cat = ImageCategories(i);
     % Compare with mahalanobis on all features
     if applyPCA
-        thedst = compareMahalanobis(query, candidate, E.val); %TRANSPOSE E.val inside Mahal function. 
+        %% TRANSPOSE E.val inside Mahal function. 
+        thedst = compareMahalanobis(query, candidate, E.val); 
     else
         %% UNCOMMENT
         % thedst = compareL1Norm_Manhattan(query, candidate); 
 
-    % Calculate a 3rd-order Minkowski distance (p=3) aka cubic distance metric. 
-    % Measures the dissimilarity between vectors with a higher sensitivity to extreme differences.
-        
+        % Calculate a 3rd-order Minkowski distance (p=3) aka cubic distance metric. 
+        % Measures the dissimilarity between vectors with a higher sensitivity to extreme differences.
         %% UNCOMMENT
         % thedst = compareMinkowskiDist(query, candidate, 3);
 
@@ -146,8 +217,7 @@ for i=1:NIMG
                                            % descriptor that matches the
                                            % query perfectly, then distance zero.
     end
-    %% FIX
-    dst=[dst ; [thedst i]]; % ; [thedst i allfiles(i).class allfiles(i).imgNum]];               
+    dst=[dst ; [thedst i cat]];              
                                            
 end
 % The smaller the distance, the more similar the image is to the query.
@@ -159,18 +229,16 @@ dst=sortrows(dst,1);
 classImgToQuery = 537;
 
 
-
-% put all in a loop ....
-
-
+%% 2nd attempt for PR to test calling external function
+%% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
 % Compute PRECISION-RECALL Curve for the top 10 results.
-precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
-
-% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
+% precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
 
 
 
 
+
+% ...................................................................................................................................
 % L7 part 1 slides 8-20 
 %% *Spatial Grid* = Colour Grid + Texture Grid
 % Try diff levels of *ANGULAR QUANTIZATION* for texture features
@@ -185,17 +253,13 @@ precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOf
 %%           with Sobel filter -> estimate edge orientation theta
 
 %% *COMBINE* EOH & COLOUR
+% ......................................................................................................................................
 
 
 
+%% 4) Display 15 images accordingly to their relevance
 
-
-
-
-
-%% 4) Visualise the results
-
-DISPLAY=15;
+DISPLAY = 15;
 dst=dst(1:DISPLAY,:);
 outdisplay=[];
 for i=1:size(dst,1)
@@ -205,7 +269,6 @@ for i=1:size(dst,1)
    outdisplay=[outdisplay img];
 end
 %imshow(outdisplay);
-% imagesc(outdisplay);  % not use
 
 figure, imshow(outdisplay);
 axis off;
@@ -214,10 +277,9 @@ axis off;
 
 % distance measures/descriptors
 % .
-% . 
-%               Wavelet Transform based Preprocessing & Features Extraction
+% Wavelet Transform based Preprocessing & Features Extraction
 % 
-%               https://www.youtube.com/watch?v=YF0zq9bcaAE
+% https://www.youtube.com/watch?v=YF0zq9bcaAE
 
 
 
@@ -239,7 +301,7 @@ axis off;
 %  Tune the Canny thresholds to get good edge maps for your images.
 
                         %% Canny vs Sobel:
-         % Use Canny instead of Sobel to getcleaner edges.
+         % Use Canny instead of Sobel to get cleaner edges.
          % Canny does additional processing like non-max suppression to get
          % better edges.
          % Compute gradient orientation and magnitude from the Canny edge map.
@@ -263,8 +325,7 @@ axis off;
 
 
 
-%% References:
-% https://www.vlfeat.org/overview/tut.html
+
 
                             %% Notes Taking
 % Feature Descriptors: These are representations of distinct features in an 
