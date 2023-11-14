@@ -19,7 +19,10 @@ SUBFOLDER = 'ceoh';
 
 % Step 1
 classesOfImages = []; % Need to compute the number of classes in the dataset
-categories = {"Farm", "Tree", "Building", "Aeroplane", "Cow", "Selfie", "Car", "Bike", "Sheep", "Flower", "Sign", "Bird", "Book", "Bench", "Cat", "Dog", "Road", "Water", "People", "Coast"};
+%categories = {"Farm", "Tree", "Building", "Aeroplane", "Cow", "Selfie", "Car", "Bike", "Sheep", "Flower", "Sign", "Bird", "Book", "Bench", "Cat", "Dog", "Road", "Water", "People", "Coast"};
+categories = {'Farm', 'Tree', 'Building', 'Aeroplane', 'Cow', 'Selfie', 'Car', 'Bike', 'Sheep', 'Flower', 'Sign', 'Bird', 'Book', 'Bench', 'Cat', 'Dog', 'Road', 'Water', 'People', 'Coast'};
+%categories = ["Farm", "Tree", "Building", "Aeroplane", "Cow", "Selfie", "Car", "Bike", "Sheep", "Flower", "Sign", "Bird", "Book", "Bench", "Cat", "Dog", "Road", "Water", "People", "Coast"];
+
 ImageCategories = [];
 ALLFEAT=[];
 ALLFILES=cell(1,0);
@@ -175,6 +178,14 @@ end
 meanCategoryPrecision = mean(allCategoryPrecision);
 meanCategoryRecall = mean(allCategoryRecall);
 
+% Plot Average Precision for each category
+figure(2);
+plot(1:TotalCategories, averagePrecisionValues);
+title('Average Precision Per Category');
+xlabel('Category Index');
+ylabel('Average Precision');
+
+
 % Plot the average precision-recall curve
 figure(3);
 plot(meanCategoryRecall, meanCategoryPrecision, 'LineWidth', 1.4, 'Marker','o');
@@ -248,8 +259,78 @@ classImgToQuery = 537;
 
 
 %% 4) Display 15 images accordingly to their relevance
+DISPLAY = 18; 
 
-DISPLAY = 15;
+for categoryIndex = 1:TotalCategories
+    queryImageIndex = IndexToSearch(categoryIndex);
+    
+    % Sort and select top results for the current query image
+    [sortedDistances, sortedIndices] = sort(pairwiseDistances(queryImageIndex, :));
+    sortedIndices = sortedIndices(1:DISPLAY); % Select top DISPLAY results
+
+    outdisplay = []; 
+    for i = 1:length(sortedIndices)
+        imgIndex = sortedIndices(i);
+        img = imread(ALLFILES{imgIndex});
+        img = img(1:2:end, 1:2:end, :);
+        img = img(1:81, :, :); 
+        outdisplay = [outdisplay img];
+
+        % Populate confusion matrix
+        retrievedCategory = ImageCategories(imgIndex);
+        categoryConfusionMatrix(retrievedCategory, categoryIndex) = categoryConfusionMatrix(retrievedCategory, categoryIndex) + 1;
+    end
+
+    %% UNCOMMENT
+    % for report 
+    %figure;
+    %imshow(outdisplay);
+    %title(['Top ', num2str(DISPLAY), ' Results for Category ', num2str(categoryIndex)]);
+end
+
+% Average PR
+figure(5);
+meanCategoryPrecision = mean(allCategoryPrecision, 1); % Mean of precision across all categories
+meanCategoryRecall = mean(allCategoryRecall, 1); % Mean of recall across all categories
+
+plot(meanCategoryRecall, meanCategoryPrecision, 'LineWidth', 4);
+title('Spatial Colour & Texture - PR');
+xlabel('Average Recall');
+ylabel('Average Precision');
+xlim([0 1]);
+ylim([0 1]);
+
+
+% For the Mean Average Precision (MAP)
+MAP = mean(averagePrecisionValues);
+fprintf('Mean Average Precision (MAP): %.4f\n', MAP);
+
+% Calculate the standard deviation of the Average Precision values
+averagePrecisionStdDev = std(averagePrecisionValues);
+fprintf('Standard Deviation of Average Precision: %.4f\n', averagePrecisionStdDev);
+
+% Visualize the distribution of Average Precision values
+figure(6); 
+histogram(averagePrecisionValues);
+title('Distribution of Average Precision Values Across Categories');
+xlabel('Average Precision');
+ylabel('Frequency of Categories');
+xlim([0, 1]);
+
+% Normalize and display the confusion matrix
+figure(7);
+normalizedCategoryConfusionMatrix = categoryConfusionMatrix ./ sum(categoryConfusionMatrix, 'all');
+confusionChart = confusionchart(categoryConfusionMatrix, categories, 'Normalization', 'column-normalized');
+%confusionChart = confusionchart(normalizedCategoryConfusionMatrix, categories, 'Normalization', 'column-normalized');
+confusionChart.Title = 'Spatial Colour & Texture (CEOH) Confusion';
+xlabel('Predicted Labels');
+ylabel('True Labels');
+
+
+
+
+
+DISPLAY = 18;
 dst=dst(1:DISPLAY,:);
 outdisplay=[];
 for i=1:size(dst,1)
