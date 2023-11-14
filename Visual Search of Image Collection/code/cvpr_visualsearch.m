@@ -19,7 +19,7 @@ SUBFOLDER = 'ceoh';
 
 % Step 1
 classesOfImages = []; % Need to compute the number of classes in the dataset
-categories = {"farm", "tree", "building", "aeroplane", "cow", "selfie", "car", "bike", "sheep", "flower", "sign", "bird", "book", "bench", "cat", "dog", "road", "water", "people", "coast"};
+categories = {"Farm", "Tree", "Building", "Aeroplane", "Cow", "Selfie", "Car", "Bike", "Sheep", "Flower", "Sign", "Bird", "Book", "Bench", "Cat", "Dog", "Road", "Water", "People", "Coast"};
 ImageCategories = [];
 ALLFEAT=[];
 ALLFILES=cell(1,0);
@@ -91,8 +91,8 @@ end
 
 
 %% 2) Pick an image at random & LOAD ITS DESCRIPTOR to be the query
-NIMG=size(ALLFEAT,1);                    % number of images in collection
-queryimg=537;                            % index of a random image
+NIMG = size(ALLFEAT,1);                    % number of images in collection
+queryimg = 537;                            % index of a random image
 % floor(537);
 % floor(431);
 
@@ -132,7 +132,7 @@ for i = 1:numImages
             % If PCA is applied, use Mahalanobis distance with eigenvalues
             pairwiseDistances(i, j) = compareMahalanobis(ALLDESCRIPTORS(i, :), ALLDESCRIPTORS(j, :), E.val);
         else
-            % If PCA is not applied, use cvpr_compare
+            % If PCA is not applied, use Euclidean
             pairwiseDistances(i, j) = cvpr_compare(ALLDESCRIPTORS(i, :), ALLDESCRIPTORS(j, :));
         end
          pairwiseDistances(j, i) = pairwiseDistances(i, j); % Symmetric matrix
@@ -159,8 +159,13 @@ for categoryIndex = 1:TotalCategories
     recallAtN = correctCategoryHits / totalRelevantImages;
     
     correctHits = sortedCategories == categoryIndex;
+    % Compute AP for 'this' category.
     averagePrecision = sum(precisionAtN(correctHits)) / totalRelevantImages;
     
+    %averagePrecision = sum(precisionAtN .* correctHits) / CategoryHistogram(categoryIndex);
+    %averagePrecisionValues(categoryIndex) = averagePrecision;
+
+    % Store AP values in array.
     averagePrecisionValues(categoryIndex) = averagePrecision;
     
     allCategoryPrecision = [allCategoryPrecision; precisionAtN];
@@ -170,16 +175,24 @@ end
 meanCategoryPrecision = mean(allCategoryPrecision);
 meanCategoryRecall = mean(allCategoryRecall);
 
-% Visualization and analysis code can be added here
-% This might include plotting the precision-recall curves,
-% displaying the confusion matrix, etc.
-
- % Plot the average precision-recall curve
+% Plot the average precision-recall curve
 figure(3);
-plot(meanCategoryRecall, meanCategoryPrecision, 'LineWidth', 2, 'Marker','o');
+plot(meanCategoryRecall, meanCategoryPrecision, 'LineWidth', 1.4, 'Marker','o');
 title('Average Precision-Recall Curve');
 xlabel('Recall');
 ylabel('Precision');
+grid on;
+
+figure(4);
+hold on;
+for i = 1:TotalCategories
+    plot(allCategoryRecall(i, :), allCategoryPrecision(i, :), 'LineWidth', 1.5);
+end
+hold off;
+title('Precision-Recall Curves for Each Category');
+xlabel('Recall');
+ylabel('Precision');
+legend(categories); % contains the names of the categories
 grid on;
 
 
@@ -228,11 +241,29 @@ dst=sortrows(dst,1);
 %classImgToQuery = floor(301); %selfie
 classImgToQuery = 537;
 
-
 %% 2nd attempt for PR to test calling external function
 %% call PR Curve with EUCLIDEAN distance and OTHER DESCRIPTORS
 % Compute PRECISION-RECALL Curve for the top 10 results.
 % precisionRecallCurve_constructor(NIMG, dst, classImgToQuery, allfiles, classesOfImages);
+
+
+%% 4) Display 15 images accordingly to their relevance
+
+DISPLAY = 15;
+dst=dst(1:DISPLAY,:);
+outdisplay=[];
+for i=1:size(dst,1)
+   img=imread(ALLFILES{dst(i,2)});
+   img=img(1:2:end,1:2:end,:); 
+   img=img(1:81,:,:); 
+   outdisplay=[outdisplay img];
+end
+%imshow(outdisplay);
+
+figure, imshow(outdisplay);
+axis off;
+
+
 
 
 
@@ -256,22 +287,6 @@ classImgToQuery = 537;
 % ......................................................................................................................................
 
 
-
-%% 4) Display 15 images accordingly to their relevance
-
-DISPLAY = 15;
-dst=dst(1:DISPLAY,:);
-outdisplay=[];
-for i=1:size(dst,1)
-   img=imread(ALLFILES{dst(i,2)});
-   img=img(1:2:end,1:2:end,:); 
-   img=img(1:81,:,:); 
-   outdisplay=[outdisplay img];
-end
-%imshow(outdisplay);
-
-figure, imshow(outdisplay);
-axis off;
 
 
 
